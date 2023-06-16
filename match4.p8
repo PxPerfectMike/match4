@@ -56,7 +56,36 @@ function structure_grid()
     end
 end
 
+--[[
+    check for matching tiles and possible solutions
+    returns:
+    -1: error in function
+     0: grid has possible solution with nothing matching
+     1: grid has a match
+     2: gird has no possible solutions with nothing matching
+]]
 function check_grid()
+    checkedTiles = {}
+    possibleSolutions = {}
+    solutionTiles = {}
+    --[[a possible solution has to consist of two matching tiles and what direction they are pointing in,
+        since we will only be checking horizontal and vertical
+        {tile number, direction}, {32, vertical}, {5, horizontal}
+
+        how do we deal with an L shaped connection?
+        have a solutions group that consists of the tiles that are part of the solution and remove those tiles independent of which match they are part of
+        so basically all the tiles in the solutions list will be moved at the end of the turn
+        going though the possible solutions list, it will check against both the grid tiles and solution tiles to find solutions,
+        but only tiles that aren't already in the solution tiles will be added to solution tiles
+
+        once a solution is found for possible solutions tile, remove them from the possible solutions list and put them into solutions tile list
+
+        instead of tracking the direction just put the adjacent tile into the second slot so it works like {32, 33} and {5, 5+x_max}
+        but how do we deal with multiples like a cross an L shape or a T shape?
+        we can just go from tile to tile and check only right and bottom connections this way it won't have an execive ammount of duplicates but should be able to check everything
+        for example with the sidways T shape it will see the top two and check up and down from that, and do the same for the rest]]
+    for i = 0, sz.x_max * sz.y_max do
+    end
 end
 -------- end page 1 --------
 -->8
