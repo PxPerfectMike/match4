@@ -4,7 +4,7 @@ __lua__
 
 ---------- page 0 ----------
 -- game engine
-candy_types = 5 -- assuming 5 types of candies
+tile_types = 5 -- assuming 5 types of candies
 grid = {}
 sz = {
     x_buff = 8,
@@ -13,7 +13,7 @@ sz = {
     y_max = 8
 }
 function _init()
-    structure_grid()
+    init_grid()
 end
 
 function _update()
@@ -50,9 +50,9 @@ function draw_ui()
     rectfill(117, 74, 118, 75, rnd(3))
 end
 
-function structure_grid()
+function init_grid()
     for i = 0, sz.x_max * sz.y_max do
-        grid[i] = rnd(5) + 1
+        grid[i] = rnd(tile_types) + 1
     end
 end
 
