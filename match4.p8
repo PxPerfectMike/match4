@@ -83,8 +83,24 @@ function check_grid()
         instead of tracking the direction just put the adjacent tile into the second slot so it works like {32, 33} and {5, 5+x_max}
         but how do we deal with multiples like a cross an L shape or a T shape?
         we can just go from tile to tile and check only right and bottom connections this way it won't have an execive ammount of duplicates but should be able to check everything
-        for example with the sidways T shape it will see the top two and check up and down from that, and do the same for the rest]]
-    for i = 0, sz.x_max * sz.y_max do
+        for example with the sidways T shape it will see the top two and check up and down from that, and do the same for the rest
+        and with the solutions it will only add tiles that aren't already in solutionTiles]]
+
+    -- exclude the bottom most row
+    for i = 0, sz.x_max * sz.y_max - sz.x_max do
+        -- exclude the right most column
+        if i % sz.x_max != sz.x_max - 1 then
+            --[[
+            -- check if tile to the right is the same color
+            if gird[i] == grid[i + 1] then
+            end
+            -- check if tile below is the same color
+            if gird[i] == grid[i + sz.x_max] then
+            end
+            ]]
+
+            -- check if the correct tiles are hilighted by not drawing them
+        end
     end
 end
 -------- end page 1 --------
