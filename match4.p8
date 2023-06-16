@@ -3,6 +3,7 @@ version 38
 __lua__
 
 ---------- page 0 ----------
+-- game engine
 candy_types = 5 -- assuming 5 types of candies
 grid = {}
 sz = {
@@ -29,10 +30,10 @@ function _draw()
     draw_ui()
 end
 
----------- end page 0 ----------
+-------- end page 0 --------
 -->8
 ---------- page 1 ----------
-
+-- helper functions
 function printsomething()
     print("something")
 end
@@ -55,11 +56,13 @@ function structure_grid()
     end
 end
 
-----------end page 1 ----------
+function check_grid()
+end
+-------- end page 1 --------
 -->8
 ---------- page 2 ----------
--- hello world
----------- end page 2 ----------
+
+-------- end page 2 --------
 
 __gfx__
 0000000000eeee0000555500005555000033330000dddd0000000000000000000000000000000000000000000000000000000000000000000000000000000000
