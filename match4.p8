@@ -8,26 +8,29 @@ __lua__
 function _init()
     -- grid info (x_buff, y_buff, x_len, y_len)
     size_of_grid(8, 8, 14, 8)
+
     -- sprite data (x, y, dim, screen_dim)
     manage_sprite_data(8, 0, 8, 8)
+
     -- enable mouse and buttons (0x5f2d, lmb, rmb)
     poke(0x5f2d, 0x1, 0x2)
+
     -- initialize grid (x, y, tile types)
     init_grid(sz.x_len, sz.y_len, 5)
 
-    selected_tile = -1
+    -- initialize selected tile (-1 = no tile selected)
+    initialize_selected_tile(-1)
 end
 
 function _update()
     -- set mouse position (x, y)
     set_mouse_pos(stat(32), stat(33))
 
-    -- check for left mouse button
-    lmb = band(stat(34), 0x1) == 0x1
+    -- check for left mouse button (stat, mouse button)
+    set_lmb(stat(34), 0x1)
 
-    if lmb then
-        selected_tile = get_clicked_tile()
-    end
+    -- set selected tile (mouse button, clicked tile)
+    set_selected_tile(lmb, get_clicked_tile())
 end
 
 function _draw()
@@ -57,6 +60,24 @@ end
 -->8
 ---------- page 1 ----------
 -- helper functions
+
+-- set selected tile (mouse button, clicked tile)
+function set_selected_tile(mb, get_clicked)
+    if mb then
+        selected_tile = get_clicked
+    end
+    return selected_tile
+end
+
+-- check for left mouse button (stat, mouse button)
+function set_lmb(stat, mb)
+    lmb = band(stat, mb) == mb
+end
+
+-- initialize selected tile (selected tile)
+function initialize_selected_tile(st)
+    selected_tile = st
+end
 
 -- set mouse position
 function set_mouse_pos(x_stat, y_stat)
