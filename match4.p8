@@ -124,9 +124,10 @@ function check_grid()
             if grid[i] == grid[i + 1] then
                 -- if the tile to the left isn't the same color
                 if grid[i] != grid[i - 1] then
+                    -- make new table with the two tile indexs
                     possible_solution = { i, i + 1 }
                     j = 2
-                    -- check the next tile, if it's the same color, add to the table
+                    -- check the following tiles, if it's the same color, add to the table
                     while grid[i] == grid[i + j] do
                         add(possible_solution, i + j)
                         j += 1
@@ -137,17 +138,18 @@ function check_grid()
         end
     end
 
+    -- track when vertical possible solutions stop
+    vertical = count(possible_solutions)
+
     for i = 0, sz.x_len * sz.y_len - sz.x_len - 1 do
         -- check if tile below is the same color
-        -- if the tile above matches this one then skip
-        -- make new table with the two tile indexs
-        -- continue to add tiles that sequentialy are also of the same color
-
         if grid[i] == grid[i + sz.x_len] then
+            -- if the tile above matches this one then skip
             if grid[i] != grid[i - sz.x_len] then
+                -- make new table with the two tile indexs
                 possible_solution = { i, i + sz.x_len }
                 j = sz.x_len * 2
-                -- check the next tile, if it's the same color, add to the table
+                -- check the following tiles, if it's the same color, add to the table
                 while grid[i] == grid[i + j] do
                     add(possible_solution, i + j)
                     j += sz.x_len
