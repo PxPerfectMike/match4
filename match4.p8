@@ -19,8 +19,10 @@ function _init()
 end
 
 function _update()
-    mouse_x = stat(32)
-    mouse_y = stat(33)
+    -- set mouse position (x, y)
+    set_mouse_pos(stat(32), stat(33))
+
+    -- check for left mouse button
     lmb = band(stat(34), 0x1) == 0x1
 
     if lmb then
@@ -55,6 +57,12 @@ end
 -->8
 ---------- page 1 ----------
 -- helper functions
+
+-- set mouse position
+function set_mouse_pos(x_stat, y_stat)
+    mouse_x = x_stat
+    mouse_y = y_stat
+end
 
 -- grid info
 function size_of_grid(x_buff, y_buff, x_len, y_len)
