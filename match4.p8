@@ -91,13 +91,6 @@ function manage_sprite_data()
     }
 end
 
-function print_clicked_tile()
-    if selected_tile ~= nil then
-        -- handle the click event, e.g., remove the tile
-        print("clicked on tile: " .. selected_tile)
-    end
-end
-
 function debug_clicked_tile()
     print(stat(34))
     if get_clicked_tile() != -1 then
@@ -135,13 +128,6 @@ end
 
 function draw_grid()
     for i = 0, sz.x_len * sz.y_len - 1 do
-        --[[spr(
-            grid[i],
-            i % sz.x_len * 8 + sz.x_buff,
-            flr(i / sz.x_len) * 8 + sz.y_buff,
-            1, 1
-        )]]
-        --type = grid[i]
         sspr(
             sp[grid[i]].x,
             sp[grid[i]].y,
