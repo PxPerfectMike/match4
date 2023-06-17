@@ -95,7 +95,6 @@ end
 [table]: table of correct tiles
 ]]
 function check_grid()
-    checked_tiles = {}
     possible_solutions = {}
     solution_tiles = {}
     --[[a possible solution has to consist of two matching tiles and what direction they are pointing in,
