@@ -40,11 +40,11 @@ function _draw()
     -- draw grid (grid x_length, grid y_length, dimension, screen dimension, x_buffer, y_buffer, sprite_data, grid_data, print_color)
     draw_grid(sz.x_len, sz.y_len, sprite_data.dim, sprite_data.screen_dim, sz.x_buff, sz.y_buff, sprite_data, grid, 7)
 
-    -- check grid
-    check_grid()
+    -- check grid (grid x_length, grid y_length, grid_data, x_buffer, y_buffer)
+    check_grid(sz.x_len, sz.y_len, grid, sz.x_buff, sz.x_buff)
 
-    --draw cursor
-    draw_cursor()
+    --draw cursor (mouse stat, x stat, y stat, sprite 1, sprite 2, sprite dim x, sprite dim y)
+    draw_cursor(stat(34), stat(32), stat(33), 16, 18, 2, 2)
     debug_clicked_tile()
 
     -- hilight clicked tile
@@ -91,12 +91,12 @@ function set_mouse_pos(x_stat, y_stat)
 end
 
 -- grid info
-function size_of_grid(x_buff, y_buff, x_len, y_len)
+function size_of_grid(_x_buff, _y_buff, _x_len, _y_len)
     sz = {
-        x_buff = x_buff,
-        y_buff = y_buff,
-        x_len = x_len,
-        y_len = y_len
+        x_buff = _x_buff,
+        y_buff = _y_buff,
+        x_len = _x_len,
+        y_len = _y_len
     }
 end
 
@@ -133,11 +133,12 @@ function debug_clicked_tile()
     end
 end
 
-function draw_cursor()
-    if stat(34) == 1 then
-        spr(16, stat(32) - 1, stat(33) - 1, 2, 2)
+-- draw cursor (mouse stat, x stat, y stat, sprite 1, sprite 2, sprite dim x, sprite dim y)
+function draw_cursor(mouse_stat, x_stat, y_stat, sprite_1, sprite_2, sprite_dim_x, sprite_dim_y)
+    if mouse_stat == 1 then
+        spr(sprite_1, x_stat - 1, y_stat - 1, sprite_dim_x, sprite_dim_y)
     else
-        spr(18, stat(32) - 1, stat(33) - 1, 2, 2)
+        spr(sprite_2, x_stat - 1, y_stat - 1, sprite_dim_x, sprite_dim_y)
     end
 end
 
@@ -186,12 +187,6 @@ function draw_ui()
     rectfill(117, 74, 118, 75, rnd(3))
 end
 
--- function init_grid()
---     for i = 0, sz.x_len * sz.y_len - 1 do
---         grid[i] = flr(rnd(tile_types)) + 1
---     end
--- end
-
 function init_grid(x_len, y_len, tile_types)
     grid = {}
     for i = 0, x_len * y_len - 1 do
@@ -207,23 +202,23 @@ end
     1: gird has no possible solutions with nothing matching
 [table]: table of correct tiles
 ]]
-function check_grid()
+function check_grid(_x_len, _y_len, _grid, _x_buff, _y_buff)
     possible_solutions = {}
     solution_tiles = {}
 
     -- checking horizontal matches
-    for i = 0, sz.x_len * sz.y_len - 1 do
+    for i = 0, _x_len * _y_len - 1 do
         -- exclude the right most column
-        if i % sz.x_len != sz.x_len - 1 then
+        if i % _x_len != _x_len - 1 then
             -- if the tile to the right is the same color
-            if grid[i] == grid[i + 1] then
+            if _grid[i] == _grid[i + 1] then
                 -- if the tile to the left isn't the same color or it's the left most tile
-                if grid[i] != grid[i - 1] or i % sz.x_len == 0 then
+                if _grid[i] != _grid[i - 1] or i % _x_len == 0 then
                     -- make new table with the two tile indexs
                     possible_solution = { i, i + 1 }
                     j = 2
                     -- check the following tiles, if it's the same color, add to the table
-                    while grid[i] == grid[i + j] and (i + j) % sz.x_len != 0 do
+                    while _grid[i] == _grid[i + j] and (i + j) % _x_len != 0 do
                         add(possible_solution, i + j)
                         j += 1
                     end
@@ -237,18 +232,18 @@ function check_grid()
     vertical = #possible_solutions
 
     -- checking vertical matches
-    for i = 0, sz.x_len * sz.y_len - sz.x_len - 1 do
+    for i = 0, _x_len * _y_len - _x_len - 1 do
         -- check if tile below is the same color
-        if grid[i] == grid[i + sz.x_len] then
+        if _grid[i] == _grid[i + _x_len] then
             -- if the tile above matches this one then skip
-            if grid[i] != grid[i - sz.x_len] then
+            if _grid[i] != _grid[i - _x_len] then
                 -- make new table with the two tile indexs
-                possible_solution = { i, i + sz.x_len }
-                j = sz.x_len * 2
+                possible_solution = { i, i + _x_len }
+                j = _x_len * 2
                 -- check the following tiles, if it's the same color, add to the table
-                while grid[i] == grid[i + j] do
+                while _grid[i] == _grid[i + j] do
                     add(possible_solution, i + j)
-                    j += sz.x_len
+                    j += _x_len
                 end
                 add(possible_solutions, possible_solution)
             end
@@ -302,10 +297,10 @@ function check_grid()
         end
 
         rect(
-            possible_solutions[i][1] % sz.x_len * sprite_data.screen_dim + sz.x_buff,
-            flr(possible_solutions[i][1] / sz.x_len) * sprite_data.screen_dim + sz.y_buff,
-            possible_solutions[i][#possible_solutions[i]] % sz.x_len * sprite_data.screen_dim + sz.x_buff + sprite_data.screen_dim - 1,
-            flr(possible_solutions[i][#possible_solutions[i]] / sz.x_len) * sprite_data.screen_dim + sz.y_buff + sprite_data.screen_dim - 1,
+            possible_solutions[i][1] % _x_len * sprite_data.screen_dim + _x_buff,
+            flr(possible_solutions[i][1] / _x_len) * sprite_data.screen_dim + _y_buff,
+            possible_solutions[i][#possible_solutions[i]] % _x_len * sprite_data.screen_dim + _x_buff + sprite_data.screen_dim - 1,
+            flr(possible_solutions[i][#possible_solutions[i]] / _x_len) * sprite_data.screen_dim + _y_buff + sprite_data.screen_dim - 1,
             color
         )
     end
