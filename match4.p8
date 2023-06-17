@@ -20,7 +20,6 @@ function _init()
 end
 
 function _update()
-
     mouse_x = stat(32)
     mouse_y = stat(33)
     lmb = band(stat(34), 0x1) == 0x1
@@ -28,16 +27,12 @@ function _update()
     if lmb then
         selected_tile = get_clicked_tile()
     end
-
 end
 
 function _draw()
     cls(12)
-    print_clicked_tile()
     draw_grid()
     check_grid()
-    draw_cursor()
-
 
     --draw cursor
     draw_cursor()
@@ -54,7 +49,6 @@ function _draw()
         )
     end
 
-
     draw_ui()
 end
 
@@ -62,6 +56,7 @@ end
 -->8
 ---------- page 1 ----------
 -- helper functions
+
 -- grid info
 function size_of_grid()
     sz = {
@@ -97,9 +92,9 @@ function manage_sprite_data()
 end
 
 function print_clicked_tile()
-    if clicked_tile ~= nil then
+    if selected_tile ~= nil then
         -- handle the click event, e.g., remove the tile
-        print("clicked on tile: " .. clicked_tile)
+        print("clicked on tile: " .. selected_tile)
     end
 end
 
@@ -136,10 +131,6 @@ function get_clicked_tile()
     end
 
     return -1
-end
-
-function printsomething()
-    print("something")
 end
 
 function draw_grid()
