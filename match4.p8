@@ -16,7 +16,7 @@ function _init()
     poke(0x5f2d, 0x1, 0x2)
 
     -- initialize grid (x, y, tile types)
-    init_grid(sz.x_len, sz.y_len, 5)
+    init_grid(grid_dimensions.x_len, grid_dimensions.y_len, 5)
 
     -- initialize selected tile (-1 = no tile selected)
     initialize_selected_tile(-1)
@@ -38,10 +38,10 @@ function _draw()
     cls(12)
 
     -- draw grid (grid x_length, grid y_length, dimension, screen dimension, x_buffer, y_buffer, sprite_data, grid_data, print_color)
-    draw_grid(sz.x_len, sz.y_len, sprite_data.dim, sprite_data.screen_dim, sz.x_buff, sz.y_buff, sprite_data, grid, 7)
+    draw_grid(grid_dimensions.x_len, grid_dimensions.y_len, sprite_data.dim, sprite_data.screen_dim, grid_dimensions.x_buff, grid_dimensions.y_buff, sprite_data, grid, 7)
 
     -- check grid (grid x_length, grid y_length, grid_data, x_buffer, y_buffer)
-    check_grid(sz.x_len, sz.y_len, grid, sz.x_buff, sz.x_buff)
+    check_grid(grid_dimensions.x_len, grid_dimensions.y_len, grid, grid_dimensions.x_buff, grid_dimensions.x_buff)
 
     --draw cursor (mouse stat, x stat, y stat, sprite 1, sprite 2, sprite dim x, sprite dim y)
     draw_cursor(stat(34), stat(32), stat(33), 16, 18, 2, 2)
@@ -50,10 +50,10 @@ function _draw()
     -- hilight clicked tile
     if selected_tile != -1 then
         rect(
-            selected_tile % sz.x_len * sprite_data.screen_dim + sz.x_buff,
-            flr(selected_tile / sz.x_len) * sprite_data.screen_dim + sz.y_buff,
-            selected_tile % sz.x_len * sprite_data.screen_dim + sz.x_buff + sprite_data.screen_dim - 1,
-            flr(selected_tile / sz.x_len) * sprite_data.screen_dim + sz.y_buff + sprite_data.screen_dim - 1,
+            selected_tile % grid_dimensions.x_len * sprite_data.screen_dim + grid_dimensions.x_buff,
+            flr(selected_tile / grid_dimensions.x_len) * sprite_data.screen_dim + grid_dimensions.y_buff,
+            selected_tile % grid_dimensions.x_len * sprite_data.screen_dim + grid_dimensions.x_buff + sprite_data.screen_dim - 1,
+            flr(selected_tile / grid_dimensions.x_len) * sprite_data.screen_dim + grid_dimensions.y_buff + sprite_data.screen_dim - 1,
             color
         )
     end
@@ -92,7 +92,7 @@ end
 
 -- grid info
 function size_of_grid(_x_buff, _y_buff, _x_len, _y_len)
-    sz = {
+    grid_dimensions = {
         x_buff = _x_buff,
         y_buff = _y_buff,
         x_len = _x_len,
@@ -100,15 +100,7 @@ function size_of_grid(_x_buff, _y_buff, _x_len, _y_len)
     }
 end
 
-function draw_cursor()
-    if stat(34) == 1 then
-        spr(16, stat(32) - 1, stat(33) - 1, 2, 2)
-    else
-        spr(18, stat(32) - 1, stat(33) - 1, 2, 2)
-    end
-end
-
-function manage_sprite_data(_x, _y, _dim, _screen_dim)
+function manage_sprite_data(_x, _y, _dim, __screen_dim)
     -- sprite data
     sprite_data = {
         { x = _x, y = _y },
@@ -120,7 +112,7 @@ function manage_sprite_data(_x, _y, _dim, _screen_dim)
         { x = _x * 7, y = _y },
         { x = _x * 8, y = _y },
         dim = _dim,
-        screen_dim = _screen_dim
+        screen_dim = __screen_dim
     }
 end
 
@@ -144,15 +136,15 @@ end
 
 function get_clicked_tile()
     if lmb then
-        tile_x = flr((mouse_x - sz.x_buff) / sprite_data.screen_dim)
-        tile_y = flr((mouse_y - sz.y_buff) / sprite_data.screen_dim)
-        tile_index = tile_y * sz.x_len + tile_x
+        tile_x = flr((mouse_x - grid_dimensions.x_buff) / sprite_data.screen_dim)
+        tile_y = flr((mouse_y - grid_dimensions.y_buff) / sprite_data.screen_dim)
+        tile_index = tile_y * grid_dimensions.x_len + tile_x
 
         -- return the tile index if it's valid
-        if mouse_x >= sz.x_buff
-                and mouse_x <= sz.x_len * sprite_data.dim + sz.x_buff
-                and mouse_y >= sz.y_buff
-                and mouse_y <= sz.y_len * sprite_data.dim + sz.y_buff then
+        if mouse_x >= grid_dimensions.x_buff
+                and mouse_x < grid_dimensions.x_len * sprite_data.dim + grid_dimensions.x_buff
+                and mouse_y >= grid_dimensions.y_buff
+                and mouse_y < grid_dimensions.y_len * sprite_data.dim + grid_dimensions.y_buff then
             return tile_index
         end
     end
@@ -173,11 +165,11 @@ function draw_grid(_x_len, _y_len, _dim, _screen_dim, _x_buff, _y_buff, _sprite_
             _screen_dim, _screen_dim
         )
 
-        print(_grid_data[i], i % _x_len * _sprite_data.screen_dim + _x_buff + 1, flr(i / _x_len) * _sprite_data.screen_dim + _y_buff + 1, _print_color)
+        print(_grid_data[i], i % _x_len * _screen_dim + _x_buff + 1, flr(i / _x_len) * _screen_dim + _y_buff + 1, _print_color)
     end
 
     -- sspr(sprite x, sprite y, sprite width, sprite height, screen x, screen y, scale x, scale y)
-    -- sspr(sprite_data[grid[i]].x, sprite_data[gird[i]].y, sprite_data.width, sprite_data.height, i % sz.x_len * 8 + sz.x_buff, flr(i / sz.x_len) * 8 + sz.y_buff, 1, 1)
+    -- sspr(sprite_data[grid[i]].x, sprite_data[gird[i]].y, sprite_data.width, sprite_data.height, i % grid_dimensions.x_len * 8 + grid_dimensions.x_buff, flr(i / grid_dimensions.x_len) * 8 + grid_dimensions.y_buff, 1, 1)
     -- spr(sprite index, screen x, screen y, # sprite width, # sprite height)
 end
 
@@ -202,6 +194,7 @@ end
     1: gird has no possible solutions with nothing matching
 [table]: table of correct tiles
 ]]
+
 function check_grid(_x_len, _y_len, _grid, _x_buff, _y_buff)
     possible_solutions = {}
     solution_tiles = {}
