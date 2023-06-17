@@ -91,12 +91,6 @@ function init_grid()
     for i = 0, sz.x_len * sz.y_len - 1 do
         grid[i] = flr(rnd(tile_types)) + 1
     end
-    grid[sz.x_len - 2] = 1
-    grid[sz.x_len - 1] = 1
-    grid[sz.x_len] = 1
-    grid[sz.x_len + 1] = 1
-    grid[14 * 7] = 8
-    grid[14 * 6] = 8
 end
 
 --[[
