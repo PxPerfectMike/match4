@@ -28,6 +28,9 @@ sp = {
     screen_dim = 8
 }
 function _init()
+    -- enable mouse and buttons
+    poke(0x5f2d, 0x1, 0x2)
+    -- initialize grid
     init_grid()
 end
 
