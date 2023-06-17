@@ -28,16 +28,29 @@ sp = {
     screen_dim = 8
 }
 function _init()
+    -- enable mouse and buttons
+    poke(0x5f2d, 0x1, 0x2)
+    -- initialize grid
     init_grid()
 end
 
 function _update()
+    local clicked_tile = get_clicked_tile()
+    if clicked_tile ~= nil then
+        -- handle the click event, e.g., remove the tile
+        print("clicked on tile: " .. clicked_tile)
+    end
 end
 
 function _draw()
     cls(12)
     draw_grid()
     check_grid()
+
+    --draw cursor
+    spr(0, stat(32) - 1, stat(33) - 1)
+    print(stat(34))
+    print(get_clicked_tile(), 0, 0, 7)
 
     --put pset in a loop for slow
     --blinking in the menu
@@ -50,6 +63,26 @@ end
 -->8
 ---------- page 1 ----------
 -- helper functions
+
+function get_clicked_tile()
+    local mouse_x = stat(32)
+    local mouse_y = stat(33)
+    local left_button = band(stat(34), 0x1) == 0x1
+
+    if left_button then
+        local tile_x = flr((mouse_x - sz.x_buff) / sp.screen_dim)
+        local tile_y = flr((mouse_y - sz.y_buff) / sp.screen_dim)
+        local tile_index = tile_y * sz.x_len + tile_x
+
+        -- return the tile index if it's valid
+        if tile_index >= 0 and tile_index < sz.x_len * sz.y_len then
+            return tile_index
+        end
+    end
+
+    return nil
+end
+
 function printsomething()
     print("something")
 end
@@ -186,7 +219,7 @@ function make_array_of_false(indexes)
     end
     return array
 end
-
+---hello world
 -------- end page 2 --------
 
 __gfx__
