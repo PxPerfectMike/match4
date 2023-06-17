@@ -150,9 +150,10 @@ function check_grid()
         end
     end
 
-    -- track when vertical possible solutions stop
+    -- track when horizontal matches stop
     vertical = count(possible_solutions)
 
+    -- checking vertical matches
     for i = 0, sz.x_len * sz.y_len - sz.x_len - 1 do
         -- check if tile below is the same color
         if grid[i] == grid[i + sz.x_len] then
@@ -171,7 +172,6 @@ function check_grid()
         end
     end
 
-    -- if one possible_solution ends where the other begins then the possible_solution to the left is invalid
     for i = 1, count(possible_solutions) do
         rect(
             possible_solutions[i][1] % sz.x_len * sp.screen_dim + sz.x_buff,
