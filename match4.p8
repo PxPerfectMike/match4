@@ -4,18 +4,17 @@ __lua__
 
 ---------- page 0 ----------
 -- game engine
-tile_types = 5
-grid = {}
 
 function _init()
-    -- grid info
-    size_of_grid()
-    -- sprite data
-    manage_sprite_data()
-    -- enable mouse and buttons
+    -- grid info (x_buff, y_buff, x_len, y_len)
+    size_of_grid(8, 8, 14, 8)
+    -- sprite data (x, y, dim, screen_dim)
+    manage_sprite_data(8, 0, 8, 8)
+    -- enable mouse and buttons (0x5f2d, lmb, rmb)
     poke(0x5f2d, 0x1, 0x2)
-    -- initialize grid
-    init_grid()
+    -- initialize grid (x, y, tile types)
+    init_grid(sz.x_len, sz.y_len, 5)
+
     selected_tile = -1
 end
 
@@ -58,12 +57,12 @@ end
 -- helper functions
 
 -- grid info
-function size_of_grid()
+function size_of_grid(x_buff, y_buff, x_len, y_len)
     sz = {
-        x_buff = 8,
-        y_buff = 8,
-        x_len = 14,
-        y_len = 8
+        x_buff = x_buff,
+        y_buff = y_buff,
+        x_len = x_len,
+        y_len = y_len
     }
 end
 
@@ -75,19 +74,19 @@ function draw_cursor()
     end
 end
 
-function manage_sprite_data()
+function manage_sprite_data(x, y, dim, screen_dim)
     -- sprite data
     sp = {
-        { x = 8, y = 0 },
-        { x = 16, y = 0 },
-        { x = 24, y = 0 },
-        { x = 32, y = 0 },
-        { x = 40, y = 0 },
-        { x = 48, y = 0 },
-        { x = 56, y = 0 },
-        { x = 64, y = 0 },
-        dim = 8,
-        screen_dim = 8
+        { x = x, y = y },
+        { x = x * 2, y = y },
+        { x = x * 3, y = y },
+        { x = x * 4, y = y },
+        { x = x * 5, y = y },
+        { x = x * 6, y = y },
+        { x = x * 7, y = y },
+        { x = x * 8, y = y },
+        dim = dim,
+        screen_dim = screen_dim
     }
 end
 
@@ -152,8 +151,15 @@ function draw_ui()
     rectfill(117, 74, 118, 75, rnd(3))
 end
 
-function init_grid()
-    for i = 0, sz.x_len * sz.y_len - 1 do
+-- function init_grid()
+--     for i = 0, sz.x_len * sz.y_len - 1 do
+--         grid[i] = flr(rnd(tile_types)) + 1
+--     end
+-- end
+
+function init_grid(x_len, y_len, tile_types)
+    grid = {}
+    for i = 0, x_len * y_len - 1 do
         grid[i] = flr(rnd(tile_types)) + 1
     end
 end
