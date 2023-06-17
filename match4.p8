@@ -72,6 +72,8 @@ function draw_grid()
             flr(i / sz.x_len) * sp.screen_dim + sz.y_buff,
             sp.screen_dim, sp.screen_dim
         )
+
+        print(grid[i], i % sz.x_len * sp.screen_dim + sz.x_buff + 1, flr(i / sz.x_len) * sp.screen_dim + sz.y_buff + 1, 7)
     end
 
     -- sspr(sprite x, sprite y, sprite width, sprite height, screen x, screen y, scale x, scale y)
@@ -86,12 +88,15 @@ function draw_ui()
 end
 
 function init_grid()
-    for i = 0, sz.x_len * sz.y_len do
+    for i = 0, sz.x_len * sz.y_len - 1 do
         grid[i] = flr(rnd(tile_types)) + 1
     end
     grid[sz.x_len - 2] = 1
     grid[sz.x_len - 1] = 1
     grid[sz.x_len] = 1
+    grid[sz.x_len + 1] = 1
+    grid[14 * 7] = 8
+    grid[14 * 6] = 8
 end
 
 --[[
@@ -129,8 +134,8 @@ function check_grid()
         if i % sz.x_len != sz.x_len - 1 then
             -- if the tile to the right is the same color
             if grid[i] == grid[i + 1] then
-                -- if the tile to the left isn't the same color
-                if grid[i] != grid[i - 1] then
+                -- if the tile to the left isn't the same color or it's the left most tile
+                if grid[i] != grid[i - 1] or i % sz.x_len == 0 then
                     -- make new table with the two tile indexs
                     possible_solution = { i, i + 1 }
                     j = 2
