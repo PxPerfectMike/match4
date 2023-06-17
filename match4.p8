@@ -34,8 +34,13 @@ function _update()
 end
 
 function _draw()
+    -- clear screen (color)
     cls(12)
-    draw_grid()
+
+    -- draw grid (grid x_length, grid y_length, dimension, screen dimension, x_buffer, y_buffer, sprite_data, grid_data, print_color)
+    draw_grid(sz.x_len, sz.y_len, sprite_data.dim, sprite_data.screen_dim, sz.x_buff, sz.y_buff, sprite_data, grid, 7)
+
+    -- check grid
     check_grid()
 
     --draw cursor
@@ -45,10 +50,10 @@ function _draw()
     -- hilight clicked tile
     if selected_tile != -1 then
         rect(
-            selected_tile % sz.x_len * sp.screen_dim + sz.x_buff,
-            flr(selected_tile / sz.x_len) * sp.screen_dim + sz.y_buff,
-            selected_tile % sz.x_len * sp.screen_dim + sz.x_buff + sp.screen_dim - 1,
-            flr(selected_tile / sz.x_len) * sp.screen_dim + sz.y_buff + sp.screen_dim - 1,
+            selected_tile % sz.x_len * sprite_data.screen_dim + sz.x_buff,
+            flr(selected_tile / sz.x_len) * sprite_data.screen_dim + sz.y_buff,
+            selected_tile % sz.x_len * sprite_data.screen_dim + sz.x_buff + sprite_data.screen_dim - 1,
+            flr(selected_tile / sz.x_len) * sprite_data.screen_dim + sz.y_buff + sprite_data.screen_dim - 1,
             color
         )
     end
@@ -105,7 +110,7 @@ end
 
 function manage_sprite_data(x, y, dim, screen_dim)
     -- sprite data
-    sp = {
+    sprite_data = {
         { x = x, y = y },
         { x = x * 2, y = y },
         { x = x * 3, y = y },
@@ -138,15 +143,15 @@ end
 
 function get_clicked_tile()
     if lmb then
-        tile_x = flr((mouse_x - sz.x_buff) / sp.screen_dim)
-        tile_y = flr((mouse_y - sz.y_buff) / sp.screen_dim)
+        tile_x = flr((mouse_x - sz.x_buff) / sprite_data.screen_dim)
+        tile_y = flr((mouse_y - sz.y_buff) / sprite_data.screen_dim)
         tile_index = tile_y * sz.x_len + tile_x
 
         -- return the tile index if it's valid
         if mouse_x >= sz.x_buff
-                and mouse_x <= sz.x_len * sp.dim + sz.x_buff
+                and mouse_x <= sz.x_len * sprite_data.dim + sz.x_buff
                 and mouse_y >= sz.y_buff
-                and mouse_y <= sz.y_len * sp.dim + sz.y_buff then
+                and mouse_y <= sz.y_len * sprite_data.dim + sz.y_buff then
             return tile_index
         end
     end
@@ -154,23 +159,24 @@ function get_clicked_tile()
     return -1
 end
 
-function draw_grid()
-    for i = 0, sz.x_len * sz.y_len - 1 do
+-- draw grid (grid x_length, grid y_length, dimension, screen dimension, x_buffer, y_buffer, sprite_data, grid_data, print_color)
+function draw_grid(_x_len, _y_len, _dim, _screen_dim, _x_buff, _y_buff, _sprite_data, _grid_data, _print_color)
+    for i = 0, _x_len * _y_len - 1 do
         sspr(
-            sp[grid[i]].x,
-            sp[grid[i]].y,
-            sp.dim,
-            sp.dim,
-            i % sz.x_len * sp.screen_dim + sz.x_buff,
-            flr(i / sz.x_len) * sp.screen_dim + sz.y_buff,
-            sp.screen_dim, sp.screen_dim
+            _sprite_data[_grid_data[i]].x,
+            _sprite_data[_grid_data[i]].y,
+            _dim,
+            _dim,
+            i % _x_len * _screen_dim + _x_buff,
+            flr(i / _x_len) * _screen_dim + _y_buff,
+            _screen_dim, _screen_dim
         )
 
-        print(grid[i], i % sz.x_len * sp.screen_dim + sz.x_buff + 1, flr(i / sz.x_len) * sp.screen_dim + sz.y_buff + 1, 7)
+        print(_grid_data[i], i % _x_len * _sprite_data.screen_dim + _x_buff + 1, flr(i / _x_len) * _sprite_data.screen_dim + _y_buff + 1, _print_color)
     end
 
     -- sspr(sprite x, sprite y, sprite width, sprite height, screen x, screen y, scale x, scale y)
-    -- sspr(sp[grid[i]].x, sp[gird[i]].y, sp.width, sp.height, i % sz.x_len * 8 + sz.x_buff, flr(i / sz.x_len) * 8 + sz.y_buff, 1, 1)
+    -- sspr(sprite_data[grid[i]].x, sprite_data[gird[i]].y, sprite_data.width, sprite_data.height, i % sz.x_len * 8 + sz.x_buff, flr(i / sz.x_len) * 8 + sz.y_buff, 1, 1)
     -- spr(sprite index, screen x, screen y, # sprite width, # sprite height)
 end
 
@@ -296,10 +302,10 @@ function check_grid()
         end
 
         rect(
-            possible_solutions[i][1] % sz.x_len * sp.screen_dim + sz.x_buff,
-            flr(possible_solutions[i][1] / sz.x_len) * sp.screen_dim + sz.y_buff,
-            possible_solutions[i][#possible_solutions[i]] % sz.x_len * sp.screen_dim + sz.x_buff + sp.screen_dim - 1,
-            flr(possible_solutions[i][#possible_solutions[i]] / sz.x_len) * sp.screen_dim + sz.y_buff + sp.screen_dim - 1,
+            possible_solutions[i][1] % sz.x_len * sprite_data.screen_dim + sz.x_buff,
+            flr(possible_solutions[i][1] / sz.x_len) * sprite_data.screen_dim + sz.y_buff,
+            possible_solutions[i][#possible_solutions[i]] % sz.x_len * sprite_data.screen_dim + sz.x_buff + sprite_data.screen_dim - 1,
+            flr(possible_solutions[i][#possible_solutions[i]] / sz.x_len) * sprite_data.screen_dim + sz.y_buff + sprite_data.screen_dim - 1,
             color
         )
     end
