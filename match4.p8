@@ -39,10 +39,6 @@ function _draw()
     draw_grid()
     check_grid()
 
-    --put pset in a loop for slow
-    --blinking in the menu
-    pset(0, 0, 3)
-
     draw_ui()
 end
 
@@ -91,12 +87,6 @@ function init_grid()
     for i = 0, sz.x_len * sz.y_len - 1 do
         grid[i] = flr(rnd(tile_types)) + 1
     end
-    grid[sz.x_len - 2] = 1
-    grid[sz.x_len - 1] = 1
-    grid[sz.x_len] = 1
-    grid[sz.x_len + 1] = 1
-    grid[14 * 7] = 8
-    grid[14 * 6] = 8
 end
 
 --[[
@@ -150,8 +140,8 @@ function check_grid()
         end
     end
 
-    -- track when horizontal matches stop
-    vertical = count(possible_solutions)
+    -- track when vertical matches start
+    vertical = #possible_solutions
 
     -- checking vertical matches
     for i = 0, sz.x_len * sz.y_len - sz.x_len - 1 do
@@ -172,12 +162,14 @@ function check_grid()
         end
     end
 
-    for i = 1, count(possible_solutions) do
+    deli(possible_solutions, 1)
+
+    for i = 1, #possible_solutions do
         rect(
             possible_solutions[i][1] % sz.x_len * sp.screen_dim + sz.x_buff,
             flr(possible_solutions[i][1] / sz.x_len) * sp.screen_dim + sz.y_buff,
-            possible_solutions[i][count(possible_solutions[i])] % sz.x_len * sp.screen_dim + sz.x_buff + sp.screen_dim - 1,
-            flr(possible_solutions[i][count(possible_solutions[i])] / sz.x_len) * sp.screen_dim + sz.y_buff + sp.screen_dim - 1,
+            possible_solutions[i][#possible_solutions[i]] % sz.x_len * sp.screen_dim + sz.x_buff + sp.screen_dim - 1,
+            flr(possible_solutions[i][#possible_solutions[i]] / sz.x_len) * sp.screen_dim + sz.y_buff + sp.screen_dim - 1,
             0
         )
     end
