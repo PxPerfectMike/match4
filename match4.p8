@@ -4,36 +4,61 @@ __lua__
 
 ---------- page 0 ----------
 -- game engine
-tile_types = 5
-grid = {}
--- add a grid change flag, and only check_grid if the flag is true
 
 function _init()
-    -- grid info
-    size_of_grid()
-    -- sprite data
-    manage_sprite_data()
-    -- enable mouse and buttons
+    -- grid info (x_buff, y_buff, x_len, y_len)
+    size_of_grid(8, 8, 14, 8)
+
+    -- sprite data (x, y, dim, screen_dim)
+    manage_sprite_data(8, 0, 8, 8)
+
+    -- enable mouse and buttons (0x5f2d, lmb, rmb)
     poke(0x5f2d, 0x1, 0x2)
-    -- initialize grid
-    init_grid()
-    selected_tile = -1
+
+    -- initialize grid (x, y, tile types)
+    init_grid(sz.x_len, sz.y_len, 5)
+
+    -- initialize selected tile (-1 = no tile selected)
+    initialize_selected_tile(-1)
 end
 
 function _update()
-    update_mouse()
-    update_tile_selection()
+    -- set mouse position (x, y)
+    set_mouse_pos(stat(32), stat(33))
+
+    -- check for left mouse button (stat, mouse button)
+    set_lmb(stat(34), 0x1)
+
+    -- set selected tile (mouse button, clicked tile)
+    set_selected_tile(lmb, get_clicked_tile())
 end
 
 function _draw()
-    -- clear screen
+    -- clear screen (color)
     cls(12)
 
+    -- draw grid (grid x_length, grid y_length, dimension, screen dimension, x_buffer, y_buffer, sprite_data, grid_data, print_color)
+    draw_grid(sz.x_len, sz.y_len, sprite_data.dim, sprite_data.screen_dim, sz.x_buff, sz.y_buff, sprite_data, grid, 7)
+
+    -- check grid (grid x_length, grid y_length, grid_data, x_buffer, y_buffer)
+    check_grid(sz.x_len, sz.y_len, grid, sz.x_buff, sz.x_buff)
+
+    --draw cursor (mouse stat, x stat, y stat, sprite 1, sprite 2, sprite dim x, sprite dim y)
+    draw_cursor(stat(34), stat(32), stat(33), 16, 18, 2, 2)
+    debug_clicked_tile()
+
+    -- hilight clicked tile
+    if selected_tile != -1 then
+        rect(
+            selected_tile % sz.x_len * sprite_data.screen_dim + sz.x_buff,
+            flr(selected_tile / sz.x_len) * sprite_data.screen_dim + sz.y_buff,
+            selected_tile % sz.x_len * sprite_data.screen_dim + sz.x_buff + sprite_data.screen_dim - 1,
+            flr(selected_tile / sz.x_len) * sprite_data.screen_dim + sz.y_buff + sprite_data.screen_dim - 1,
+            color
+        )
+    end
+
     draw_ui()
-    -- tempory
-    check_grid()
-    draw_cursor()
-    draw_debug()
 end
 
 -------- end page 0 --------
@@ -41,51 +66,37 @@ end
 ---------- page 1 ----------
 -- helper functions
 
-function draw_debug()
-    debug_clicked_tile()
-end
-
-function update_mouse()
-    mouse_x = stat(32)
-    mouse_y = stat(33)
-    lmb = band(stat(34), 0x1) == 0x1
-end
-
-function update_tile_selection()
-    if lmb then
-        selected_tile = get_clicked_tile()
+-- set selected tile (mouse button, clicked tile)
+function set_selected_tile(mb, get_clicked)
+    if mb then
+        selected_tile = get_clicked
     end
+    return selected_tile
 end
 
-function highlight_tile(tile, color)
-    local x = tile % sz.x_len
-    local y = tile / sz.x_len
-    rect(
-        x * sp.screen_dim + sz.x_buff,
-        flr(y) * sp.screen_dim + sz.y_buff,
-        x * sp.screen_dim + sz.x_buff + sp.screen_dim - 1,
-        flr(y) * sp.screen_dim + sz.y_buff + sp.screen_dim - 1,
-        color
-    )
+-- check for left mouse button (stat, mouse button)
+function set_lmb(stat, mb)
+    lmb = band(stat, mb) == mb
 end
 
-function highlight_tile_group(tiles, color)
-    rect(
-        tiles[1] % sz.x_len * sp.screen_dim + sz.x_buff,
-        flr(tiles[1] / sz.x_len) * sp.screen_dim + sz.y_buff,
-        tiles[#tiles] % sz.x_len * sp.screen_dim + sz.x_buff + sp.screen_dim - 1,
-        flr(tiles[#tiles] / sz.x_len) * sp.screen_dim + sz.y_buff + sp.screen_dim - 1,
-        color
-    )
+-- initialize selected tile (selected tile)
+function initialize_selected_tile(st)
+    selected_tile = st
+end
+
+-- set mouse position
+function set_mouse_pos(x_stat, y_stat)
+    mouse_x = x_stat
+    mouse_y = y_stat
 end
 
 -- grid info
-function size_of_grid()
+function size_of_grid(_x_buff, _y_buff, _x_len, _y_len)
     sz = {
-        x_buff = 8,
-        y_buff = 8,
-        x_len = 14,
-        y_len = 8
+        x_buff = _x_buff,
+        y_buff = _y_buff,
+        x_len = _x_len,
+        y_len = _y_len
     }
 end
 
@@ -97,27 +108,20 @@ function draw_cursor()
     end
 end
 
-function manage_sprite_data()
+function manage_sprite_data(x, y, dim, screen_dim)
     -- sprite data
-    sp = {
-        { x = 8, y = 0 },
-        { x = 16, y = 0 },
-        { x = 24, y = 0 },
-        { x = 32, y = 0 },
-        { x = 40, y = 0 },
-        { x = 48, y = 0 },
-        { x = 56, y = 0 },
-        { x = 64, y = 0 },
-        dim = 8,
-        screen_dim = 8
+    sprite_data = {
+        { x = x, y = y },
+        { x = x * 2, y = y },
+        { x = x * 3, y = y },
+        { x = x * 4, y = y },
+        { x = x * 5, y = y },
+        { x = x * 6, y = y },
+        { x = x * 7, y = y },
+        { x = x * 8, y = y },
+        dim = dim,
+        screen_dim = screen_dim
     }
-end
-
-function print_clicked_tile()
-    if selected_tile ~= nil then
-        -- handle the click event, e.g., remove the tile
-        print("clicked on tile: " .. selected_tile)
-    end
 end
 
 function debug_clicked_tile()
@@ -129,25 +133,26 @@ function debug_clicked_tile()
     end
 end
 
-function draw_cursor()
-    if stat(34) == 1 then
-        spr(16, stat(32) - 1, stat(33) - 1, 2, 2)
+-- draw cursor (mouse stat, x stat, y stat, sprite 1, sprite 2, sprite dim x, sprite dim y)
+function draw_cursor(mouse_stat, x_stat, y_stat, sprite_1, sprite_2, sprite_dim_x, sprite_dim_y)
+    if mouse_stat == 1 then
+        spr(sprite_1, x_stat - 1, y_stat - 1, sprite_dim_x, sprite_dim_y)
     else
-        spr(18, stat(32) - 1, stat(33) - 1, 2, 2)
+        spr(sprite_2, x_stat - 1, y_stat - 1, sprite_dim_x, sprite_dim_y)
     end
 end
 
 function get_clicked_tile()
     if lmb then
-        tile_x = flr((mouse_x - sz.x_buff) / sp.screen_dim)
-        tile_y = flr((mouse_y - sz.y_buff) / sp.screen_dim)
+        tile_x = flr((mouse_x - sz.x_buff) / sprite_data.screen_dim)
+        tile_y = flr((mouse_y - sz.y_buff) / sprite_data.screen_dim)
         tile_index = tile_y * sz.x_len + tile_x
 
         -- return the tile index if it's valid
         if mouse_x >= sz.x_buff
-                and mouse_x <= sz.x_len * sp.dim + sz.x_buff
+                and mouse_x <= sz.x_len * sprite_data.dim + sz.x_buff
                 and mouse_y >= sz.y_buff
-                and mouse_y <= sz.y_len * sp.dim + sz.y_buff then
+                and mouse_y <= sz.y_len * sprite_data.dim + sz.y_buff then
             return tile_index
         end
     end
@@ -155,24 +160,24 @@ function get_clicked_tile()
     return -1
 end
 
-function draw_grid()
-    for i = 0, sz.x_len * sz.y_len - 1 do
+-- draw grid (grid x_length, grid y_length, dimension, screen dimension, x_buffer, y_buffer, sprite_data, grid_data, print_color)
+function draw_grid(_x_len, _y_len, _dim, _screen_dim, _x_buff, _y_buff, _sprite_data, _grid_data, _print_color)
+    for i = 0, _x_len * _y_len - 1 do
         sspr(
-            sp[grid[i]].x,
-            sp[grid[i]].y,
-            sp.dim,
-            sp.dim,
-            i % sz.x_len * sp.screen_dim + sz.x_buff,
-            flr(i / sz.x_len) * sp.screen_dim + sz.y_buff,
-            sp.screen_dim, sp.screen_dim
+            _sprite_data[_grid_data[i]].x,
+            _sprite_data[_grid_data[i]].y,
+            _dim,
+            _dim,
+            i % _x_len * _screen_dim + _x_buff,
+            flr(i / _x_len) * _screen_dim + _y_buff,
+            _screen_dim, _screen_dim
         )
 
-        -- print number associated with tile type
-        print(grid[i], i % sz.x_len * sp.screen_dim + sz.x_buff + 1, flr(i / sz.x_len) * sp.screen_dim + sz.y_buff + 1, 7)
+        print(_grid_data[i], i % _x_len * _sprite_data.screen_dim + _x_buff + 1, flr(i / _x_len) * _sprite_data.screen_dim + _y_buff + 1, _print_color)
     end
 
     -- sspr(sprite x, sprite y, sprite width, sprite height, screen x, screen y, scale x, scale y)
-    -- sspr(sp[grid[i]].x, sp[gird[i]].y, sp.width, sp.height, i % sz.x_len * 8 + sz.x_buff, flr(i / sz.x_len) * 8 + sz.y_buff, 1, 1)
+    -- sspr(sprite_data[grid[i]].x, sprite_data[gird[i]].y, sprite_data.width, sprite_data.height, i % sz.x_len * 8 + sz.x_buff, flr(i / sz.x_len) * 8 + sz.y_buff, 1, 1)
     -- spr(sprite index, screen x, screen y, # sprite width, # sprite height)
 end
 
@@ -189,8 +194,9 @@ function draw_ui()
     end
 end
 
-function init_grid()
-    for i = 0, sz.x_len * sz.y_len - 1 do
+function init_grid(x_len, y_len, tile_types)
+    grid = {}
+    for i = 0, x_len * y_len - 1 do
         grid[i] = flr(rnd(tile_types)) + 1
     end
 end
@@ -203,23 +209,23 @@ end
     1: gird has no possible solutions with nothing matching
 [table]: table of correct tiles
 ]]
-function check_grid()
+function check_grid(_x_len, _y_len, _grid, _x_buff, _y_buff)
     possible_solutions = {}
     solution_tiles = {}
 
     -- checking horizontal matches
-    for i = 0, sz.x_len * sz.y_len - 1 do
+    for i = 0, _x_len * _y_len - 1 do
         -- exclude the right most column
-        if i % sz.x_len != sz.x_len - 1 then
+        if i % _x_len != _x_len - 1 then
             -- if the tile to the right is the same color
-            if grid[i] == grid[i + 1] then
+            if _grid[i] == _grid[i + 1] then
                 -- if the tile to the left isn't the same color or it's the left most tile
-                if grid[i] != grid[i - 1] or i % sz.x_len == 0 then
+                if _grid[i] != _grid[i - 1] or i % _x_len == 0 then
                     -- make new table with the two tile indexs
                     possible_solution = { i, i + 1 }
                     j = 2
                     -- check the following tiles, if it's the same color, add to the table
-                    while grid[i] == grid[i + j] and (i + j) % sz.x_len != 0 do
+                    while _grid[i] == _grid[i + j] and (i + j) % _x_len != 0 do
                         add(possible_solution, i + j)
                         j += 1
                     end
@@ -233,18 +239,18 @@ function check_grid()
     vertical = #possible_solutions
 
     -- checking vertical matches
-    for i = 0, sz.x_len * sz.y_len - sz.x_len - 1 do
+    for i = 0, _x_len * _y_len - _x_len - 1 do
         -- check if tile below is the same color
-        if grid[i] == grid[i + sz.x_len] then
+        if _grid[i] == _grid[i + _x_len] then
             -- if the tile above matches this one then skip
-            if grid[i] != grid[i - sz.x_len] then
+            if _grid[i] != _grid[i - _x_len] then
                 -- make new table with the two tile indexs
-                possible_solution = { i, i + sz.x_len }
-                j = sz.x_len * 2
+                possible_solution = { i, i + _x_len }
+                j = _x_len * 2
                 -- check the following tiles, if it's the same color, add to the table
-                while grid[i] == grid[i + j] do
+                while _grid[i] == _grid[i + j] do
                     add(possible_solution, i + j)
-                    j += sz.x_len
+                    j += _x_len
                 end
                 add(possible_solutions, possible_solution)
             end
@@ -297,7 +303,13 @@ function check_grid()
             deli(possible_solutions, i + 1)
         end
 
-        --highlight_tile_group(possible_solutions[i], color)
+        rect(
+            possible_solutions[i][1] % _x_len * sprite_data.screen_dim + _x_buff,
+            flr(possible_solutions[i][1] / _x_len) * sprite_data.screen_dim + _y_buff,
+            possible_solutions[i][#possible_solutions[i]] % _x_len * sprite_data.screen_dim + _x_buff + sprite_data.screen_dim - 1,
+            flr(possible_solutions[i][#possible_solutions[i]] / _x_len) * sprite_data.screen_dim + _y_buff + sprite_data.screen_dim - 1,
+            color
+        )
     end
 end
 -------- end page 1 --------
