@@ -35,12 +35,26 @@ function _init()
 end
 
 function _update()
+    local clicked_tile = get_clicked_tile()
+    if clicked_tile ~= nil then
+        -- handle the click event, e.g., remove the tile
+        print("clicked on tile: " .. clicked_tile)
+    end
 end
 
 function _draw()
     cls(12)
     draw_grid()
     check_grid()
+
+    --draw cursor
+    spr(0, stat(32) - 1, stat(33) - 1)
+    print(stat(34))
+    if get_clicked_tile() != -1 then
+        print("" .. get_clicked_tile() .. ":" .. grid[get_clicked_tile()], 0, 0, 7)
+    else
+        print("[nil]", 0, 0, 7)
+    end
 
     draw_ui()
 end
@@ -49,6 +63,29 @@ end
 -->8
 ---------- page 1 ----------
 -- helper functions
+
+function get_clicked_tile()
+    mouse_x = stat(32)
+    mouse_y = stat(33)
+    left_button = band(stat(34), 0x1) == 0x1
+
+    if left_button then
+        tile_x = flr((mouse_x - sz.x_buff) / sp.screen_dim)
+        tile_y = flr((mouse_y - sz.y_buff) / sp.screen_dim)
+        tile_index = tile_y * sz.x_len + tile_x
+
+        -- return the tile index if it's valid
+        if mouse_x >= sz.x_buff
+                and mouse_x <= sz.x_len * sp.dim + sz.x_buff
+                and mouse_y >= sz.y_buff
+                and mouse_y <= sz.y_len * sp.dim + sz.y_buff then
+            return tile_index
+        end
+    end
+
+    return -1
+end
+
 function printsomething()
     print("something")
 end
@@ -103,23 +140,6 @@ end
 function check_grid()
     possible_solutions = {}
     solution_tiles = {}
-    --[[a possible solution has to consist of two matching tiles and what direction they are pointing in,
-        since we will only be checking horizontal and vertical
-        {tile number, direction}, {32, vertical}, {5, horizontal}
-
-        how do we deal with an L shaped connection?
-        have a solutions group that consists of the tiles that are part of the solution and remove those tiles independent of which match they are part of
-        so basically all the tiles in the solutions list will be moved at the end of the turn
-        going though the possible solutions list, it will check against both the grid tiles and solution tiles to find solutions,
-        but only tiles that aren't already in the solution tiles will be added to solution tiles
-
-        once a solution is found for possible solutions tile, remove them from the possible solutions list and put them into solutions tile list
-
-        instead of tracking the direction just put the adjacent tile into the second slot so it works like {32, 33} and {5, 5+x_len}
-        but how do we deal with multiples like a cross an L shape or a T shape?
-        we can just go from tile to tile and check only right and bottom connections this way it won't have an execive ammount of duplicates but should be able to check everything
-        for example with the sidways T shape it will see the top two and check up and down from that, and do the same for the rest
-        and with the solutions it will only add tiles that aren't already in solution_tiles]]
 
     -- checking horizontal matches
     for i = 0, sz.x_len * sz.y_len - 1 do
@@ -165,15 +185,51 @@ function check_grid()
         end
     end
 
-    deli(possible_solutions, 1)
+    --deli(possible_solutions, 1) starts at 1 not 0
 
     for i = 1, #possible_solutions do
+        color = 0
+
+        if #possible_solutions[i] == 2 then
+            solvable = false
+            if i < vertical then
+                -- if horizontal
+                -- the first item will be the left most tile so check to the left, top, and bottom of the first tile
+                -- the last item will be the right most tile so check the right, top, and bottom of the last tile
+            else
+                -- if vertical
+                -- the first item will be the top most tile so check to the top, left, and right of the first tile
+                -- the last item will be the bottom most tile so check the bottom, left, and right of the last tile
+            end
+            if solvable then color = 7 end
+        elseif #possible_solutions[i] == 3 then
+            solvable = false
+            if i < vertical then
+                -- if horizontal
+                -- the first item will be the left most tile so check to the left, top, and bottom of the first tile
+                -- the last item will be the right most tile so check the right, top, and bottom of the last tile
+            else
+                -- if vertical
+                -- the first item will be the top most tile so check to the top, left, and right of the first tile
+                -- the last item will be the bottom most tile so check the bottom, left, and right of the last tile
+            end
+            if solvable then color = 7 end
+        else
+            color = 9
+        end
+
+        if i < vertical then
+            color = 7
+        else
+            color = 0
+        end
+
         rect(
             possible_solutions[i][1] % sz.x_len * sp.screen_dim + sz.x_buff,
             flr(possible_solutions[i][1] / sz.x_len) * sp.screen_dim + sz.y_buff,
             possible_solutions[i][#possible_solutions[i]] % sz.x_len * sp.screen_dim + sz.x_buff + sp.screen_dim - 1,
             flr(possible_solutions[i][#possible_solutions[i]] / sz.x_len) * sp.screen_dim + sz.y_buff + sp.screen_dim - 1,
-            0
+            color
         )
     end
 end
@@ -191,13 +247,13 @@ end
 -------- end page 2 --------
 
 __gfx__
-0000000022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
-0770077022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
-0777777022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
-0077770022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
-0077770022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
-0777777022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
-0770077022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
+0100000022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
+1710000022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
+1771000022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
+1777100022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
+1777710022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
+1771100022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
+0117100022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
 0000000022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
