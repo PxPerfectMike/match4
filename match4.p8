@@ -6,39 +6,12 @@ __lua__
 -- game engine
 tile_types = 5
 grid = {}
--- grid info
-sz = {
-    x_buff = 8,
-    y_buff = 8,
-    x_len = 14,
-    y_len = 8
-}
-
--- sprite info
-sp = {
-    { x = 8, y = 0 },
-    { x = 16, y = 0 },
-    { x = 24, y = 0 },
-    { x = 32, y = 0 },
-    { x = 40, y = 0 },
-    { x = 48, y = 0 },
-    { x = 56, y = 0 },
-    { x = 64, y = 0 },
-    dim = 8,
-    screen_dim = 8
-}
-
---[[
-test_table = {
-    function()
-        print("hello", 20, 0, 7)
-    end,
-    function()
-        print("world")
-    end
-}]]
 
 function _init()
+    -- grid info
+    size_of_grid()
+    -- sprite data
+    manage_sprite_data()
     -- enable mouse and buttons
     poke(0x5f2d, 0x1, 0x2)
     -- initialize grid
@@ -47,6 +20,7 @@ function _init()
 end
 
 function _update()
+
     mouse_x = stat(32)
     mouse_y = stat(33)
     lmb = band(stat(34), 0x1) == 0x1
@@ -54,12 +28,16 @@ function _update()
     if lmb then
         selected_tile = get_clicked_tile()
     end
+
 end
 
 function _draw()
     cls(12)
+    print_clicked_tile()
     draw_grid()
     check_grid()
+    draw_cursor()
+
 
     --draw cursor
     draw_cursor()
@@ -76,6 +54,7 @@ function _draw()
         )
     end
 
+
     draw_ui()
 end
 
@@ -83,6 +62,46 @@ end
 -->8
 ---------- page 1 ----------
 -- helper functions
+-- grid info
+function size_of_grid()
+    sz = {
+        x_buff = 8,
+        y_buff = 8,
+        x_len = 14,
+        y_len = 8
+    }
+end
+
+function draw_cursor()
+    if stat(34) == 1 then
+        spr(16, stat(32) - 1, stat(33) - 1, 2, 2)
+    else
+        spr(18, stat(32) - 1, stat(33) - 1, 2, 2)
+    end
+end
+
+function manage_sprite_data()
+    -- sprite data
+    sp = {
+        { x = 8, y = 0 },
+        { x = 16, y = 0 },
+        { x = 24, y = 0 },
+        { x = 32, y = 0 },
+        { x = 40, y = 0 },
+        { x = 48, y = 0 },
+        { x = 56, y = 0 },
+        { x = 64, y = 0 },
+        dim = 8,
+        screen_dim = 8
+    }
+end
+
+function print_clicked_tile()
+    if clicked_tile ~= nil then
+        -- handle the click event, e.g., remove the tile
+        print("clicked on tile: " .. clicked_tile)
+    end
+end
 
 function debug_clicked_tile()
     print(stat(34))
