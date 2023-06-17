@@ -61,6 +61,13 @@ end
 -------- end page 1 --------
 -->8
 ---------- page 2 ----------
+function make_array_of_false(indexes)
+    local array = {}
+    for i = 0, indexes do
+        array[i] = false
+    end
+    return array
+end
 
 -------- end page 2 --------
 
