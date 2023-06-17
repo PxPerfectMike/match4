@@ -137,75 +137,25 @@ function check_grid()
         end
     end
 
-    --[[
-
-    -- checking horizontal matches
-    for i = 0, sz.x_len * sz.y_len - 1 do
-        -- exclude the right most column
-        if i % sz.x_len != sz.x_len - 1 then
-            -- check if tile to the right is the same color
-            if grid[i] == grid[i + 1] then
-                -- if this is an edge tile
-                if i % sz.x_len == 0 then
-                    possible_solution = { i, i + 1 }
-                    j = 2
-                    -- check the next tile, if it's the same color, add to the table
-                    while grid[i] == grid[i + j] do
-                        add(possible_solution, i + j)
-                        j += 1
-                    end
-                    -- if the tile to the left isn't the same color
-                elseif grid[i] != grid[i - 1] then
-                    possible_solution = { i, i + 1 }
-                    j = 2
-                    -- check the next tile, if it's the same color, add to the table
-                    while grid[i] == grid[i + j] do
-                        add(possible_solution, i + j)
-                        j += 1
-                    end
-                    add(possible_solutions, possible_solution)
-                end
-                --add(possible_solutions,
-            end
-        end
-    end
-
-    -- checking vertical matches
-    -- exclude the bottom most row
     for i = 0, sz.x_len * sz.y_len - sz.x_len - 1 do
-        -- check if tile to the right is the same color
-        if grid[i] == grid[i + 1] then
-            -- if this is an edge tile
-            if i % sz.x_len == 0 then
-                possible_solution = { i, i + 1 }
-                j = 2
-                -- check the next tile, if it's the same color, add to the table
-                while grid[i] == grid[i + j] do
-                    add(possible_solution, i + j)
-                    j += 1
-                end
-                -- if the tile to the left isn't the same color
-            elseif grid[i] != grid[i - 1] then
-                possible_solution = { i, i + 1 }
-                j = 2
-                -- check the next tile, if it's the same color, add to the table
-                while grid[i] == grid[i + j] do
-                    add(possible_solution, i + j)
-                    j += 1
-                end
-                add(possible_solutions, possible_solution)
-            end
-            --add(possible_solutions,
-        end
         -- check if tile below is the same color
         -- if the tile above matches this one then skip
         -- make new table with the two tile indexs
         -- continue to add tiles that sequentialy are also of the same color
 
         if grid[i] == grid[i + sz.x_len] then
+            if grid[i] != grid[i - sz.x_len] then
+                possible_solution = { i, i + sz.x_len }
+                j = sz.x_len * 2
+                -- check the next tile, if it's the same color, add to the table
+                while grid[i] == grid[i + j] do
+                    add(possible_solution, i + j)
+                    j += sz.x_len
+                end
+                add(possible_solutions, possible_solution)
+            end
         end
     end
-    ]]
 
     -- if one possible_solution ends where the other begins then the possible_solution to the left is invalid
     for i = 1, count(possible_solutions) do
