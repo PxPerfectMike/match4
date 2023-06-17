@@ -27,18 +27,32 @@ sp = {
     dim = 8,
     screen_dim = 8
 }
+
+--[[
+test_table = {
+    function()
+        print("hello", 20, 0, 7)
+    end,
+    function()
+        print("world")
+    end
+}]]
+
 function _init()
     -- enable mouse and buttons
     poke(0x5f2d, 0x1, 0x2)
     -- initialize grid
     init_grid()
+    selected_tile = -1
 end
 
 function _update()
-    local clicked_tile = get_clicked_tile()
-    if clicked_tile ~= nil then
-        -- handle the click event, e.g., remove the tile
-        print("clicked on tile: " .. clicked_tile)
+    mouse_x = stat(32)
+    mouse_y = stat(33)
+    lmb = band(stat(34), 0x1) == 0x1
+
+    if lmb then
+        selected_tile = get_clicked_tile()
     end
 end
 
@@ -48,12 +62,18 @@ function _draw()
     check_grid()
 
     --draw cursor
-    spr(0, stat(32) - 1, stat(33) - 1)
-    print(stat(34))
-    if get_clicked_tile() != -1 then
-        print("" .. get_clicked_tile() .. ":" .. grid[get_clicked_tile()], 0, 0, 7)
-    else
-        print("[nil]", 0, 0, 7)
+    draw_cursor()
+    debug_clicked_tile()
+
+    -- hilight clicked tile
+    if selected_tile != -1 then
+        rect(
+            selected_tile % sz.x_len * sp.screen_dim + sz.x_buff,
+            flr(selected_tile / sz.x_len) * sp.screen_dim + sz.y_buff,
+            selected_tile % sz.x_len * sp.screen_dim + sz.x_buff + sp.screen_dim - 1,
+            flr(selected_tile / sz.x_len) * sp.screen_dim + sz.y_buff + sp.screen_dim - 1,
+            color
+        )
     end
 
     draw_ui()
@@ -64,12 +84,25 @@ end
 ---------- page 1 ----------
 -- helper functions
 
-function get_clicked_tile()
-    mouse_x = stat(32)
-    mouse_y = stat(33)
-    left_button = band(stat(34), 0x1) == 0x1
+function debug_clicked_tile()
+    print(stat(34))
+    if get_clicked_tile() != -1 then
+        print("" .. get_clicked_tile() .. ":" .. grid[get_clicked_tile()], 0, 0, 7)
+    else
+        print("[nil]", 0, 0, 7)
+    end
+end
 
-    if left_button then
+function draw_cursor()
+    if stat(34) == 1 then
+        spr(16, stat(32) - 1, stat(33) - 1, 2, 2)
+    else
+        spr(18, stat(32) - 1, stat(33) - 1, 2, 2)
+    end
+end
+
+function get_clicked_tile()
+    if lmb then
         tile_x = flr((mouse_x - sz.x_buff) / sp.screen_dim)
         tile_y = flr((mouse_y - sz.y_buff) / sp.screen_dim)
         tile_index = tile_y * sz.x_len + tile_x
@@ -132,7 +165,7 @@ end
 --[[
     check for matching tiles and possible solutions
     returns:
-    -1: error in function
+   -1: error in function
     0: grid has possible solution with nothing matching
     1: gird has no possible solutions with nothing matching
 [table]: table of correct tiles
@@ -190,20 +223,24 @@ function check_grid()
     for i = 1, #possible_solutions do
         color = 0
 
+        solvable = false
+
         if #possible_solutions[i] == 2 then
-            solvable = false
             if i < vertical then
                 -- if horizontal
-                -- the first item will be the left most tile so check to the left, top, and bottom of the first tile
-                -- the last item will be the right most tile so check the right, top, and bottom of the last tile
+                -- the first item will be the left most tile so if there's a same tile x2 over to the left of the first tile
+                -- check the top and bottom for the tile to the left of the first tile
+                -- the last item will be the right most tile so if there's a same tile x2 over to the right of the first tile
+                -- check the top and bottom for the tile to the right of the last tile
             else
                 -- if vertical
-                -- the first item will be the top most tile so check to the top, left, and right of the first tile
-                -- the last item will be the bottom most tile so check the bottom, left, and right of the last tile
+                -- the first item will be the top most tile so if there's a same tile x2 over the top of the first tile
+                -- check the left and right for the tile above the first tile
+                -- the last item will be the bottom most tile so if there's a same tile x2 under the bottom of the last tile
+                -- check the left and right for the tile below the last tile
             end
-            if solvable then color = 7 end
+            solvable = true
         elseif #possible_solutions[i] == 3 then
-            solvable = false
             if i < vertical then
                 -- if horizontal
                 -- the first item will be the left most tile so check to the left, top, and bottom of the first tile
@@ -213,15 +250,18 @@ function check_grid()
                 -- the first item will be the top most tile so check to the top, left, and right of the first tile
                 -- the last item will be the bottom most tile so check the bottom, left, and right of the last tile
             end
-            if solvable then color = 7 end
+            solvable = true
         else
+            -- this is already a solution so add it to solutions
             color = 9
+            solvable = true
         end
 
-        if i < vertical then
-            color = 7
-        else
+        if solvable then
             color = 0
+        else
+            -- the error is probably coming from the change in size so the index is shifted when one of them is deleted
+            deli(possible_solutions, i + 1)
         end
 
         rect(
