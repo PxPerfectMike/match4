@@ -89,6 +89,9 @@ function init_grid()
     for i = 0, sz.x_len * sz.y_len do
         grid[i] = flr(rnd(tile_types)) + 1
     end
+    grid[sz.x_len - 2] = 1
+    grid[sz.x_len - 1] = 1
+    grid[sz.x_len] = 1
 end
 
 --[[
@@ -132,7 +135,7 @@ function check_grid()
                     possible_solution = { i, i + 1 }
                     j = 2
                     -- check the following tiles, if it's the same color, add to the table
-                    while grid[i] == grid[i + j] do
+                    while grid[i] == grid[i + j] and (i + j) % sz.x_len != 0 do
                         add(possible_solution, i + j)
                         j += 1
                     end
