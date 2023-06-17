@@ -108,19 +108,19 @@ function draw_cursor()
     end
 end
 
-function manage_sprite_data(x, y, dim, screen_dim)
+function manage_sprite_data(_x, _y, _dim, _screen_dim)
     -- sprite data
     sprite_data = {
-        { x = x, y = y },
-        { x = x * 2, y = y },
-        { x = x * 3, y = y },
-        { x = x * 4, y = y },
-        { x = x * 5, y = y },
-        { x = x * 6, y = y },
-        { x = x * 7, y = y },
-        { x = x * 8, y = y },
-        dim = dim,
-        screen_dim = screen_dim
+        { x = _x, y = _y },
+        { x = _x * 2, y = _y },
+        { x = _x * 3, y = _y },
+        { x = _x * 4, y = _y },
+        { x = _x * 5, y = _y },
+        { x = _x * 6, y = _y },
+        { x = _x * 7, y = _y },
+        { x = _x * 8, y = _y },
+        dim = _dim,
+        screen_dim = _screen_dim
     }
 end
 
