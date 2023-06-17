@@ -4,7 +4,7 @@ __lua__
 
 ---------- page 0 ----------
 -- game engine
-tile_types = 8
+tile_types = 5
 grid = {}
 -- grid info
 sz = {
