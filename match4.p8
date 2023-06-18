@@ -37,6 +37,8 @@ function _draw()
     -- clear screen (color)
     cls(2)
 
+    draw_grid(grid_dimensions.x_len, grid_dimensions.y_len, sprite_data.dim, sprite_data.screen_dim, grid_dimensions.x_buff, grid_dimensions.y_buff, sprite_data, grid, 7)
+
     draw_ui()
 
     -- check grid (grid x_length, grid y_length, grid_data, x_buffer, y_buffer)
@@ -228,15 +230,12 @@ function draw_grid(_x_len, _y_len, _dim, _screen_dim, _x_buff, _y_buff, _sprite_
 end
 
 function draw_ui()
-    -- draw grid (grid x_length, grid y_length, dimension, screen dimension, x_buffer, y_buffer, sprite_data, grid_data, print_color)
-    draw_grid(grid_dimensions.x_len, grid_dimensions.y_len, sprite_data.dim, sprite_data.screen_dim, grid_dimensions.x_buff, grid_dimensions.y_buff, sprite_data, grid, 7)
-
-    -- hilight clicked tile
+    -- highlight clicked tile
     if selected_tile != -1 then
-        highlight_tile(selected_tile, grid_dimensions.x_len, grid_dimensions.x_buff, grid_dimensions.y_buff, color)
+        highlight_tile(selected_tile, grid_dimensions.x_len, grid_dimensions.x_buff, grid_dimensions.y_buff, 10)
     end
 
-    -- draw boarders
+    -- draw borders
     rect(8, 73, 119, 120, 4)
     rectfill(9, 74, 10, 75, rnd(3))
     rectfill(117, 74, 118, 75, rnd(3))
@@ -252,7 +251,7 @@ end
 --[[
     check for matching tiles and possible solutions
     returns:
-   -1: error in function
+-1: error in function
     0: grid has possible solution with nothing matching
     1: gird has no possible solutions with nothing matching
 [table]: table of correct tiles
