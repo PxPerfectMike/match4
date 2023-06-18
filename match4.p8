@@ -37,18 +37,15 @@ function _draw()
     -- clear screen (color)
     cls(2)
 
-
     draw_ui()
-
 
     -- check grid (grid x_length, grid y_length, grid_data, x_buffer, y_buffer)
     check_grid(grid_dimensions.x_len, grid_dimensions.y_len, grid, grid_dimensions.x_buff, grid_dimensions.x_buff)
 
     --draw cursor (mouse stat, x stat, y stat, sprite 1, sprite 2, sprite dim x, sprite dim y)
     draw_cursor(stat(34), stat(32), stat(33), 16, 18, 2, 2)
-  
-    draw_debug()
 
+    draw_debug()
 end
 
 -------- end page 0 --------
@@ -154,9 +151,7 @@ function size_of_grid(_x_buff, _y_buff, _x_len, _y_len)
     }
 end
 
-
 function manage_sprite_data(_x, _y, _dim, __screen_dim)
-
     -- sprite data
     sprite_data = {
         { x = _x, y = _y },
@@ -234,11 +229,11 @@ end
 
 function draw_ui()
     -- draw grid (grid x_length, grid y_length, dimension, screen dimension, x_buffer, y_buffer, sprite_data, grid_data, print_color)
-    draw_grid(sz.x_len, sz.y_len, sprite_data.dim, sprite_data.screen_dim, sz.x_buff, sz.y_buff, sprite_data, grid, 7)
+    draw_grid(grid_dimensions.x_len, grid_dimensions.y_len, sprite_data.dim, sprite_data.screen_dim, grid_dimensions.x_buff, grid_dimensions.y_buff, sprite_data, grid, 7)
 
     -- hilight clicked tile
     if selected_tile != -1 then
-        highlight_tile(selected_tile, sz.x_len, sz.x_buff, sz.y_buff, color)
+        highlight_tile(selected_tile, grid_dimensions.x_len, grid_dimensions.x_buff, grid_dimensions.y_buff, color)
     end
 
     -- draw boarders
