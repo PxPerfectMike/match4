@@ -45,7 +45,6 @@ function _draw()
 
     draw_ui()
 
-
     -- check grid (grid x_length, grid y_length, grid_data, x_buffer, y_buffer)
     check_grid(grid_dimensions.x_len, grid_dimensions.y_len, grid, grid_dimensions.x_buff, grid_dimensions.x_buff)
 
@@ -171,7 +170,6 @@ function size_of_grid(_x_buff, _y_buff, _x_len, _y_len)
     }
 end
 
-
 -- sprite data
 function manage_sprite_data(_x, _y, _dim, __screen_dim)
     sprite_data = {
@@ -255,7 +253,6 @@ function highlight_selected_tile(_tile, _x_len, _x_buff, _y_buff, color)
     end
 end
 
-
 function draw_ui()
     -- draw borders
 
@@ -270,7 +267,6 @@ function init_grid(x_len, y_len, tile_types)
         grid[i] = flr(rnd(tile_types)) + 1
     end
 end
-
 
 -- checking matching horizontal sequential tiles
 function horizontal_matches(_x_len, _y_len, _grid, _possible_solutions)
