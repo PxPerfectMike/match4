@@ -35,36 +35,90 @@ end
 
 function _draw()
     -- clear screen (color)
-    cls(12)
+    cls(2)
 
-    -- draw grid (grid x_length, grid y_length, dimension, screen dimension, x_buffer, y_buffer, sprite_data, grid_data, print_color)
-    draw_grid(grid_dimensions.x_len, grid_dimensions.y_len, sprite_data.dim, sprite_data.screen_dim, grid_dimensions.x_buff, grid_dimensions.y_buff, sprite_data, grid, 7)
+
+    draw_ui()
+
 
     -- check grid (grid x_length, grid y_length, grid_data, x_buffer, y_buffer)
     check_grid(grid_dimensions.x_len, grid_dimensions.y_len, grid, grid_dimensions.x_buff, grid_dimensions.x_buff)
 
     --draw cursor (mouse stat, x stat, y stat, sprite 1, sprite 2, sprite dim x, sprite dim y)
     draw_cursor(stat(34), stat(32), stat(33), 16, 18, 2, 2)
-    debug_clicked_tile()
+  
+    draw_debug()
 
-    -- hilight clicked tile
-    if selected_tile != -1 then
-        rect(
-            selected_tile % grid_dimensions.x_len * sprite_data.screen_dim + grid_dimensions.x_buff,
-            flr(selected_tile / grid_dimensions.x_len) * sprite_data.screen_dim + grid_dimensions.y_buff,
-            selected_tile % grid_dimensions.x_len * sprite_data.screen_dim + grid_dimensions.x_buff + sprite_data.screen_dim - 1,
-            flr(selected_tile / grid_dimensions.x_len) * sprite_data.screen_dim + grid_dimensions.y_buff + sprite_data.screen_dim - 1,
-            color
-        )
-    end
-
-    draw_ui()
 end
 
 -------- end page 0 --------
 -->8
 ---------- page 1 ----------
 -- helper functions
+
+--[[
+    checks if there are a certain number of columns to the left of this tile
+    default is 1
+]]
+function row_above(_tile, _count)
+    local count = _count or 1
+end
+
+--[[
+    checks if there are a certain number of columns to the left of this tile
+    default is 1
+]]
+function row_below(_tile, _count)
+    local count = _count or 1
+end
+
+--[[
+    checks if there are a certain number of columns to the left of this tile
+    default is 1
+]]
+function column_right(_tile, _count)
+    local count = _count or 1
+end
+
+--[[
+    checks if there are a certain number of columns to the left of this tile
+    default is 1
+]]
+function column_left(_tile, _count)
+    local count = _count or 1
+end
+
+-- get the last item in a table
+function get_last(_table)
+    return _table[#_table]
+end
+
+-- draws or enables drawing of debug information
+function draw_debug()
+    debug_clicked_tile()
+end
+
+-- hilights a tile on the grid
+function highlight_tile(_tile, _x_len, _x_buff, _y_buff, _color)
+    rect(
+        _tile % _x_len * sprite_data.screen_dim + _x_buff,
+        flr(_tile / _x_len) * sprite_data.screen_dim + _y_buff,
+        _tile % _x_len * sprite_data.screen_dim + _x_buff + sprite_data.screen_dim - 1,
+        flr(_tile / _x_len) * sprite_data.screen_dim + _y_buff + sprite_data.screen_dim - 1,
+        _color
+    )
+end
+
+-- hilights a group of tiles on the grid (make sure it's horizontal or vertical)
+function highlight_tile_group(_tiles, _x_len, _x_buff, _y_buff, _color)
+    rect(
+        _tiles[1] % _x_len * sprite_data.screen_dim + _x_buff,
+        flr(_tiles[1] / _x_len) * sprite_data.screen_dim + _y_buff,
+        get_last(_tiles) % _x_len * sprite_data.screen_dim + _x_buff + sprite_data.screen_dim - 1,
+        flr(get_last(_tiles) / _x_len) * sprite_data.screen_dim + _y_buff + sprite_data.screen_dim - 1,
+        _color
+    )
+end
 
 -- set selected tile (mouse button, clicked tile)
 function set_selected_tile(mb, get_clicked)
@@ -100,7 +154,9 @@ function size_of_grid(_x_buff, _y_buff, _x_len, _y_len)
     }
 end
 
+
 function manage_sprite_data(_x, _y, _dim, __screen_dim)
+
     -- sprite data
     sprite_data = {
         { x = _x, y = _y },
@@ -112,6 +168,7 @@ function manage_sprite_data(_x, _y, _dim, __screen_dim)
         { x = _x * 7, y = _y },
         { x = _x * 8, y = _y },
         dim = _dim,
+
         screen_dim = __screen_dim
     }
 end
@@ -155,15 +212,17 @@ end
 -- draw grid (grid x_length, grid y_length, dimension, screen dimension, x_buffer, y_buffer, sprite_data, grid_data, print_color)
 function draw_grid(_x_len, _y_len, _dim, _screen_dim, _x_buff, _y_buff, _sprite_data, _grid_data, _print_color)
     for i = 0, _x_len * _y_len - 1 do
-        sspr(
-            _sprite_data[_grid_data[i]].x,
-            _sprite_data[_grid_data[i]].y,
-            _dim,
-            _dim,
-            i % _x_len * _screen_dim + _x_buff,
-            flr(i / _x_len) * _screen_dim + _y_buff,
-            _screen_dim, _screen_dim
-        )
+        if true then
+            sspr(
+                _sprite_data[_grid_data[i]].x,
+                _sprite_data[_grid_data[i]].y,
+                _dim,
+                _dim,
+                i % _x_len * _screen_dim + _x_buff,
+                flr(i / _x_len) * _screen_dim + _y_buff,
+                _screen_dim, _screen_dim
+            )
+        end
 
         print(_grid_data[i], i % _x_len * _screen_dim + _x_buff + 1, flr(i / _x_len) * _screen_dim + _y_buff + 1, _print_color)
     end
@@ -174,6 +233,15 @@ function draw_grid(_x_len, _y_len, _dim, _screen_dim, _x_buff, _y_buff, _sprite_
 end
 
 function draw_ui()
+    -- draw grid (grid x_length, grid y_length, dimension, screen dimension, x_buffer, y_buffer, sprite_data, grid_data, print_color)
+    draw_grid(sz.x_len, sz.y_len, sprite_data.dim, sprite_data.screen_dim, sz.x_buff, sz.y_buff, sprite_data, grid, 7)
+
+    -- hilight clicked tile
+    if selected_tile != -1 then
+        highlight_tile(selected_tile, sz.x_len, sz.x_buff, sz.y_buff, color)
+    end
+
+    -- draw boarders
     rect(8, 73, 119, 120, 4)
     rectfill(9, 74, 10, 75, rnd(3))
     rectfill(117, 74, 118, 75, rnd(3))
@@ -196,8 +264,8 @@ end
 ]]
 
 function check_grid(_x_len, _y_len, _grid, _x_buff, _y_buff)
-    possible_solutions = {}
-    solution_tiles = {}
+    local possible_solutions = {}
+    local solution_tiles = {}
 
     -- checking horizontal matches
     for i = 0, _x_len * _y_len - 1 do
@@ -208,8 +276,8 @@ function check_grid(_x_len, _y_len, _grid, _x_buff, _y_buff)
                 -- if the tile to the left isn't the same color or it's the left most tile
                 if _grid[i] != _grid[i - 1] or i % _x_len == 0 then
                     -- make new table with the two tile indexs
-                    possible_solution = { i, i + 1 }
-                    j = 2
+                    local possible_solution = { i, i + 1 }
+                    local j = 2
                     -- check the following tiles, if it's the same color, add to the table
                     while _grid[i] == _grid[i + j] and (i + j) % _x_len != 0 do
                         add(possible_solution, i + j)
@@ -222,7 +290,7 @@ function check_grid(_x_len, _y_len, _grid, _x_buff, _y_buff)
     end
 
     -- track when vertical matches start
-    vertical = #possible_solutions
+    local horizontal = #possible_solutions
 
     -- checking vertical matches
     for i = 0, _x_len * _y_len - _x_len - 1 do
@@ -231,8 +299,8 @@ function check_grid(_x_len, _y_len, _grid, _x_buff, _y_buff)
             -- if the tile above matches this one then skip
             if _grid[i] != _grid[i - _x_len] then
                 -- make new table with the two tile indexs
-                possible_solution = { i, i + _x_len }
-                j = _x_len * 2
+                local possible_solution = { i, i + _x_len }
+                local j = _x_len * 2
                 -- check the following tiles, if it's the same color, add to the table
                 while _grid[i] == _grid[i + j] do
                     add(possible_solution, i + j)
@@ -246,56 +314,192 @@ function check_grid(_x_len, _y_len, _grid, _x_buff, _y_buff)
     --deli(possible_solutions, 1) starts at 1 not 0
 
     for i = 1, #possible_solutions do
-        color = 0
+        --local color = 0
 
-        solvable = false
+        local solvable = false
 
         if #possible_solutions[i] == 2 then
-            if i < vertical then
-                -- if horizontal
-                -- the first item will be the left most tile so if there's a same tile x2 over to the left of the first tile
-                -- check the top and bottom for the tile to the left of the first tile
-                -- the last item will be the right most tile so if there's a same tile x2 over to the right of the first tile
-                -- check the top and bottom for the tile to the right of the last tile
-            else
+            if i > horizontal then
                 -- if vertical
-                -- the first item will be the top most tile so if there's a same tile x2 over the top of the first tile
-                -- check the left and right for the tile above the first tile
+
                 -- the last item will be the bottom most tile so if there's a same tile x2 under the bottom of the last tile
                 -- check the left and right for the tile below the last tile
-            end
-            solvable = true
-        elseif #possible_solutions[i] == 3 then
-            if i < vertical then
-                -- if horizontal
-                -- the first item will be the left most tile so check to the left, top, and bottom of the first tile
-                -- the last item will be the right most tile so check the right, top, and bottom of the last tile
+
+                local tile_index = possible_solutions[i][1]
+                local tile_type = _grid[tile_index]
+                -- the first item will be the top most tile so if there's a same tile x2 over the top of the first tile
+                -- so if the first tile has at least 2 tiles above it
+                if flr(tile_index / _x_len) >= 2 then
+                    -- check the tile above by two
+                    if _grid[tile_index - 2 * _x_len] == tile_type then
+                        -- check the left and right for the tile above the first tile
+
+                        -- if there is a column to the right
+                        if tile_index % _x_len < _x_len - 1 then
+                            if _grid[tile_index - _x_len + 1] == tile_type then
+                                solvable = true
+                                highlight_tile(tile_index - _x_len + 1, _x_len, _x_buff, _y_buff, 10)
+                            end
+                        end
+
+                        -- if there is a column to the left
+                        if tile_index % _x_len >= 1 then
+                            if _grid[tile_index - _x_len - 1] == tile_type then
+                                solvable = true
+                                highlight_tile(tile_index - _x_len - 1, _x_len, _x_buff, _y_buff, 10)
+                            end
+                        end
+
+                        if solvable then
+                            highlight_tile_group(possible_solutions[i], _x_len, _x_buff, _y_buff, 10)
+                            highlight_tile(tile_index - 2 * _x_len, _x_len, _x_buff, _y_buff, 10)
+                        end
+                    end
+                end
+
+                tile_index = get_last(possible_solutions[i])
+                -- the last item will be the right most tile so if there's a same tile x2 over to the right of the first tile
+                -- so if the last tile has at least 2 tiles to the right of it
+                if flr(tile_index / _x_len) < _y_len - 2 then
+                    -- check the tile under by two
+                    if _grid[tile_index + 2 * _x_len] == tile_type then
+                        -- check the left and right for the tile below the last tile
+
+                        -- if there is a column to the right
+                        if tile_index % _x_len < _x_len - 1 then
+                            -- check that the above tile is the same
+                            if _grid[tile_index + _x_len + 1] == tile_type then
+                                solvable = true
+                                highlight_tile(tile_index + _x_len + 1, _x_len, _x_buff, _y_buff, 10)
+                            end
+                        end
+
+                        -- if there is a column to the left
+                        if tile_index % _x_len >= 1 then
+                            -- check that the below tile is the same
+                            if _grid[tile_index + _x_len - 1] == tile_type then
+                                solvable = true
+                                highlight_tile(tile_index + _x_len - 1, _x_len, _x_buff, _y_buff, 10)
+                            end
+                        end
+
+                        if solvable then
+                            highlight_tile_group(possible_solutions[i], _x_len, _x_buff, _y_buff, 10)
+                            highlight_tile(tile_index + 2 * _x_len, _x_len, _x_buff, _y_buff, 10)
+                        end
+                    end
+                end
             else
-                -- if vertical
-                -- the first item will be the top most tile so check to the top, left, and right of the first tile
-                -- the last item will be the bottom most tile so check the bottom, left, and right of the last tile
+                -- if horizontal
+
+                local tile_index = possible_solutions[i][1]
+                local tile_type = _grid[tile_index]
+                -- the first item will be the left most tile so if there's a same tile x2 over to the left of the first tile
+                -- so if the first tile has at least 2 tiles to the left of it
+                if tile_index % _x_len >= 2 then
+                    -- check the tile over by two
+                    if _grid[tile_index - 2] == tile_type then
+                        -- check the top and bottom for the tile to the left of the first tile
+
+                        -- if there is a row above
+                        if flr(tile_index / _x_len) >= 1 then
+                            if _grid[tile_index - 1 - _x_len] == tile_type then
+                                solvable = true
+                                highlight_tile(tile_index - 1 - _x_len, _x_len, _x_buff, _y_buff, 10)
+                            end
+                        end
+                        -- if there is a row below
+                        if flr(tile_index / _x_len) < _y_len - 1 then
+                            if _grid[tile_index - 1 + _x_len] == tile_type then
+                                solvable = true
+                                highlight_tile(tile_index - 1 + _x_len, _x_len, _x_buff, _y_buff, 10)
+                            end
+                        end
+
+                        if solvable then
+                            highlight_tile_group(possible_solutions[i], _x_len, _x_buff, _y_buff, 10)
+                            highlight_tile(tile_index - 2, _x_len, _x_buff, _y_buff, 10)
+                        end
+                    end
+                end
+
+                tile_index = get_last(possible_solutions[i])
+                -- the last item will be the right most tile so if there's a same tile x2 over to the right of the first tile
+                -- so if the last tile has at least 2 tiles to the right of it
+                if tile_index % _x_len < _x_len - 2 then
+                    -- check the tile over by two
+                    if _grid[tile_index + 2] == tile_type then
+                        -- check the top and bottom for the tile to the right of the last tile
+
+                        -- if there is a row above
+                        if flr(tile_index / _x_len) >= 1 then
+                            -- check that the above tile is the same
+                            if _grid[tile_index + 1 - _x_len] == tile_type then
+                                solvable = true
+                                highlight_tile(tile_index + 1 - _x_len, _x_len, _x_buff, _y_buff, 10)
+                            end
+                        end
+                        -- if there is a row below
+                        if flr(tile_index / _x_len) < _y_len - 1 then
+                            -- check that the below tile is the same
+                            if _grid[tile_index + 1 + _x_len] == tile_type then
+                                solvable = true
+                                highlight_tile(tile_index + 1 + _x_len, _x_len, _x_buff, _y_buff, 10)
+                            end
+                        end
+
+                        if solvable then
+                            highlight_tile_group(possible_solutions[i], _x_len, _x_buff, _y_buff, 10)
+                            highlight_tile(tile_index + 2, _x_len, _x_buff, _y_buff, 10)
+                        end
+                    end
+                end
             end
-            solvable = true
+        elseif #possible_solutions[i] == 3 then
+            if i > horizontal then
+                -- if vertical
+
+                local tile_index = possible_solutions[i][1]
+
+                -- check if there is a left and right column
+                local left = tile_index % _x_len >= 1
+                local right = tile_index % _x_len < _x_len - 1
+
+                local tile_type = _grid[tile_index]
+                -- the first item will be the top most tile so check to the top, left, and right of the first tile
+
+                if (flr(tile_index / _x_len) >= 1) local tile_index = get_last(possible_solutions[i])
+                -- the last item will be the bottom most tile so check the bottom, left, and right of the last tile
+            else
+                -- if horizontal
+
+                local tile_index = possible_solutions[i][1]
+
+                -- check if there's a above and below row
+                local above = flr(tile_index / _x_len) >= 1
+                local below = flr(tile_index / _x_len) < _y_len - 1
+
+                local tile_type = _grid[tile_index]
+                -- the first item will be the left most tile so check to the left, top, and bottom of the first tile
+
+                local tile_index = get_last(possible_solutions[i])
+                -- the last item will be the right most tile so check the right, top, and bottom of the last tile
+            end
         else
             -- this is already a solution so add it to solutions
-            color = 9
-            solvable = true
+            highlight_tile_group(possible_solutions[i], _x_len, _x_buff, _y_buff, 10)
+            -- solvable = true
         end
 
         if solvable then
-            color = 0
+            -- color = 9
         else
             -- the error is probably coming from the change in size so the index is shifted when one of them is deleted
-            deli(possible_solutions, i + 1)
+            --deli(possible_solutions, i + 1)
+            -- color = 0
         end
 
-        rect(
-            possible_solutions[i][1] % _x_len * sprite_data.screen_dim + _x_buff,
-            flr(possible_solutions[i][1] / _x_len) * sprite_data.screen_dim + _y_buff,
-            possible_solutions[i][#possible_solutions[i]] % _x_len * sprite_data.screen_dim + _x_buff + sprite_data.screen_dim - 1,
-            flr(possible_solutions[i][#possible_solutions[i]] / _x_len) * sprite_data.screen_dim + _y_buff + sprite_data.screen_dim - 1,
-            color
-        )
+        --highlight_tile_group(possible_solutions[i], _x_len, _x_buff, _y_buff, color)
     end
 end
 -------- end page 1 --------
@@ -312,22 +516,22 @@ end
 -------- end page 2 --------
 
 __gfx__
-0000000022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
-0000000022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
-0070070022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
-0007700022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
-0007700022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
-0070070022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
-0000000022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
-0000000022222222bbbbbbbb8888888811111111aaaaaaaaeeeeeeee44444444dddddddd00000000000000000000000000000000000000000000000000000000
-01100001110000000110000011100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-17710116771000001771001167710000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-17771671677100001777116716771000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-16777167777710000167771677771000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-01677777775771000016777777577100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-00167777577571000001777757757100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-00116777757771000001677775777100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-00155677777771100015577777777110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000ccccccccbbbbbbbb88888888eeeeeeee999999990000000000000000000000000007d000000000000007d00000000000000000000000000000077000
+00000000ccccccccbbbbbbbb88888888eeeeeeee9999999900000000000000000000000000777d0000777d0000777d0000700000000007000070070000777700
+00700700ccccccccbbbbbbbb88888888eeeeeeee99999999000000000000000000000000077777d000777d00077777d007777770077777700777777007777770
+00077000ccccccccbbbbbbbb88888888eeeeeeee9999999900000000000000000000000000777d0000777d0000777d0077777770077777777777777777777777
+00077000ccccccccbbbbbbbb88888888eeeeeeee9999999900000000000000000000000000777d0000777d0000777d00d77777700777777dd777777d67777776
+00700700ccccccccbbbbbbbb88888888eeeeeeee9999999900000000000000000000000000777d00077777d0077777d00d7dddd00dddd7d00d7dd7d006777760
+00000000ccccccccbbbbbbbb88888888eeeeeeee9999999900000000000000000000000000777d0000777d0000777d0000d0000000000d0000d00d0000677600
+00000000ccccccccbbbbbbbb88888888eeeeeeee99999999000000000000000000000000000000000007d0000007d00000000000000000000000000000066000
+011000011100000001100000111000000000000000000000000000000000000000000000011d111d000000000000000000000000000000000000000000000000
+1771011677100000177100116771000000000000000000000000000000000000011d111d0cc1c7c1000000000000000000000000000000000000000000000000
+17771671677100001777116716771000000000000000000000000000000000000cc1c7c19ac17cc1000000000000000000000000000000000000000000000000
+16777167777710000167771677771000000000000000000000000000000000009ac17cc19a7aaaaa000000000000000000000000000000000000000000000000
+01677777775771000016777777577100000000000000000000000000000000009a7aaaaa9a7aaaaa000000000000000000000000000000000000000000000000
+00167777577571000001777757757100000000000000000000000000000000009a7010109a910101000000000000000000000000000000000000000000000000
+00116777757771000001677775777100000000000000000000000000000000009a91ddd1aa50ddd0000000000000000000000000000000000000000000000000
+0015567777777110001557777777711000000000000000000000000000000000aa50101005510101000000000000000000000000000000000000000000000000
 00156677777717710015677777771771000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00016677777777710001677777777771000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00001666661776100000166661777610000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
