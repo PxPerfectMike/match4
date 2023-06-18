@@ -318,111 +318,109 @@ end
 function valid_2_tile_solution(i, _horizontal, _possible_solutions, _grid, _x_len, _y_len)
     local valid = false
 
+    --======================================================================================
+    -- if the connecting tiles are vertical
     if i > _horizontal then
-        -- if the connecting tiles are vertical
+        local curr_tile = _possible_solutions[i][1]
+        local tile_type = _grid[curr_tile]
 
-        local tile_index = _possible_solutions[i][1]
-        local tile_type = _grid[tile_index]
-        -- the first item will be the top most tile so if there's a same tile x2 over the top of the first tile
-
-        -- so if the top tile has at least 2 tiles above it
-        if rows_above(tile_index, _x_len, 2) then
+        --=================================================================
+        -- [the first item will be the top most tile so if there's a same tile x2 over the top of the first tile]
+        -- check above by 2
+        if rows_above(curr_tile, _x_len, 2) then
             -- if there is a matching tile two spaces above the top tile
-            if _grid[tile_index - 2 * _x_len] == tile_type then
+            if _grid[curr_tile - 2 * _x_len] == tile_type then
                 -- check the left and right of the tile above the top tile
 
                 -- check right
-                if columns_right(tile_index, _x_len) then
-                    if _grid[tile_index - _x_len + 1] == tile_type then
-                        valid = true
-                    end
+                if columns_right(curr_tile, _x_len) then
+                    if (_grid[curr_tile - _x_len + 1] == tile_type) valid = true
                 end
 
                 -- check left
-                if columns_left(tile_index, _x_len) then
-                    if _grid[tile_index - _x_len - 1] == tile_type then
-                        valid = true
-                    end
+                if columns_left(curr_tile, _x_len) then
+                    if (_grid[curr_tile - _x_len - 1] == tile_type) valid = true
                 end
             end
         end
+        --=================================================================
 
-        tile_index = get_last(_possible_solutions[i])
-        -- the last item will be the right most tile so if there's a same tile x2 over to the right of the first tile
+        curr_tile = get_last(_possible_solutions[i])
 
-        -- so if the bottom tile has at least 2 tiles below it
-        if columns_right(tile_index, _x_len, 2) then
+        --=================================================================
+        -- [the last item will be the right most tile so if there's a same tile x2 over to the right of the first tile]
+        -- check below by 2
+        if columns_right(curr_tile, _x_len, 2) then
             -- if there is a matching tile two spaces below the bottom tile
-            if _grid[tile_index + 2 * _x_len] == tile_type then
+            if _grid[curr_tile + 2 * _x_len] == tile_type then
                 -- check the left and right of the tile below the bottom tile
 
                 -- check right
-                if tile_index % _x_len < _x_len - 1 then
-                    if _grid[tile_index + _x_len + 1] == tile_type then
-                        valid = true
-                    end
+                if curr_tile % _x_len < _x_len - 1 then
+                    if (_grid[curr_tile + _x_len + 1] == tile_type) valid = true
                 end
 
                 -- check left
-                if tile_index % _x_len >= 1 then
-                    if _grid[tile_index + _x_len - 1] == tile_type then
-                        valid = true
-                    end
+                if curr_tile % _x_len >= 1 then
+                    if (_grid[curr_tile + _x_len - 1] == tile_type) valid = true
                 end
             end
         end
+        --==================================================================================
     else
-        -- if horizontal
+        --==================================================================================
+        -- if the connecting tiles are horizontal
 
-        local tile_index = _possible_solutions[i][1]
-        local tile_type = _grid[tile_index]
-        -- the first item will be the left most tile so if there's a same tile x2 over to the left of the first tile
-        -- so if the first tile has at least 2 tiles to the left of it
-        if tile_index % _x_len >= 2 then
+        local curr_tile = _possible_solutions[i][1]
+        local tile_type = _grid[curr_tile]
+
+        --=================================================================
+        -- [the first item will be the left most tile so if there's a same tile x2 over to the left of the first tile]
+        -- check to the left by 2
+        if curr_tile % _x_len >= 2 then
             -- check the tile over by two
-            if _grid[tile_index - 2] == tile_type then
+            if _grid[curr_tile - 2] == tile_type then
                 -- check the top and bottom for the tile to the left of the first tile
+                local left_tile = curr_tile - 1
 
-                -- if there is a row above
-                if flr(tile_index / _x_len) >= 1 then
-                    if _grid[tile_index - 1 - _x_len] == tile_type then
-                        valid = true
-                    end
+                -- check above
+                if flr(curr_tile / _x_len) >= 1 then
+                    if (_grid[left_tile - _x_len] == tile_type) valid = true
                 end
-                -- if there is a row below
-                if flr(tile_index / _x_len) < _y_len - 1 then
-                    if _grid[tile_index - 1 + _x_len] == tile_type then
-                        valid = true
-                    end
+
+                -- check below
+                if flr(curr_tile / _x_len) < _y_len - 1 then
+                    if (_grid[left_tile + _x_len] == tile_type) valid = true
                 end
             end
         end
+        --=================================================================
 
-        tile_index = get_last(_possible_solutions[i])
-        -- the last item will be the right most tile so if there's a same tile x2 over to the right of the first tile
-        -- so if the last tile has at least 2 tiles to the right of it
-        if tile_index % _x_len < _x_len - 2 then
+        curr_tile = get_last(_possible_solutions[i])
+
+        --=================================================================
+        -- [the last item will be the right most tile so if there's a same tile x2 over to the right of the first tile]
+        -- check to the right by 2
+        if columns_right(curr_tile, _x_len, 2) then
             -- check the tile over by two
-            if _grid[tile_index + 2] == tile_type then
+            if _grid[curr_tile + 2] == tile_type then
                 -- check the top and bottom for the tile to the right of the last tile
+                local right_tile = curr_tile + 1
 
-                -- if there is a row above
-                if flr(tile_index / _x_len) >= 1 then
-                    -- check that the above tile is the same
-                    if _grid[tile_index + 1 - _x_len] == tile_type then
-                        valid = true
-                    end
+                -- check above
+                if rows_above(curr_tile, _x_len) then
+                    if (_grid[right_tile - _x_len] == tile_type) valid = true
                 end
-                -- if there is a row below
-                if flr(tile_index / _x_len) < _y_len - 1 then
-                    -- check that the below tile is the same
-                    if _grid[tile_index + 1 + _x_len] == tile_type then
-                        valid = true
-                    end
+
+                -- check  below
+                if rows_below(curr_tile, _x_len, _y_len) then
+                    if (_grid[right_tile + _x_len] == tile_type) valid = true
                 end
             end
         end
+        --=================================================================
     end
+    --======================================================================================
 
     return valid
 end
