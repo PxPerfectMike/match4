@@ -38,11 +38,13 @@ function _draw()
     cls(2)
 
     -- draw grid (grid x_length, grid y_length, dimension, screen dimension, x_buffer, y_buffer, sprite_data, grid_data, print_color)
+
     draw_grid(grid_dimensions.x_len, grid_dimensions.y_len, sprite_data.dim, sprite_data.screen_dim, grid_dimensions.x_buff, grid_dimensions.y_buff, sprite_data, grid, 7)
 
     highlight_selected_tile(selected_tile, grid_dimensions.x_len, grid_dimensions.x_buff, grid_dimensions.y_buff, color)
 
     draw_ui()
+
 
     -- check grid (grid x_length, grid y_length, grid_data, x_buffer, y_buffer)
     check_grid(grid_dimensions.x_len, grid_dimensions.y_len, grid, grid_dimensions.x_buff, grid_dimensions.x_buff)
@@ -169,6 +171,7 @@ function size_of_grid(_x_buff, _y_buff, _x_len, _y_len)
     }
 end
 
+
 -- sprite data
 function manage_sprite_data(_x, _y, _dim, __screen_dim)
     sprite_data = {
@@ -252,8 +255,10 @@ function highlight_selected_tile(_tile, _x_len, _x_buff, _y_buff, color)
     end
 end
 
+
 function draw_ui()
-    -- draw boarders
+    -- draw borders
+
     rect(8, 73, 119, 120, 4)
     rectfill(9, 74, 10, 75, rnd(3))
     rectfill(117, 74, 118, 75, rnd(3))
@@ -265,6 +270,7 @@ function init_grid(x_len, y_len, tile_types)
         grid[i] = flr(rnd(tile_types)) + 1
     end
 end
+
 
 -- checking matching horizontal sequential tiles
 function horizontal_matches(_x_len, _y_len, _grid, _possible_solutions)
